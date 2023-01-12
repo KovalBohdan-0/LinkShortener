@@ -30,6 +30,10 @@ public class Link {
     @Min(value=1,message="User id is mandatory")
     private long userId;
 
+    public Link() {
+
+    }
+
     public String getFullLink() {
         return fullLink;
     }
@@ -84,5 +88,15 @@ public class Link {
         result = 31 * result + (int) (id ^ (id >>> 32));
         result = 31 * result + (int) (userId ^ (userId >>> 32));
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Link{" +
+                "fullLink='" + fullLink + '\'' +
+                ", shortLink='" + shortLink + '\'' +
+                ", id=" + id +
+                ", userId=" + userId +
+                '}';
     }
 }
