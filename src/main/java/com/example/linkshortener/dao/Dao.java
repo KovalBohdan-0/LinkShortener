@@ -1,8 +1,11 @@
 package com.example.linkshortener.dao;
 
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface Dao<T> {
     Optional<T> get(long id);
 
@@ -10,7 +13,7 @@ public interface Dao<T> {
 
     void save(T t);
 
-    void update(T t, String[] params);
+    void update(T t);
 
     void delete(T t);
 }

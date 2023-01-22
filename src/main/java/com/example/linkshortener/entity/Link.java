@@ -1,14 +1,18 @@
 package com.example.linkshortener.entity;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "links", schema = "public", catalog = "link_shortener")
@@ -25,13 +29,19 @@ public class Link {
     @Id
     @Column(name = "id")
     private long id;
-    @Basic
-    @Column(name = "user_id")
-    @Min(value=1,message="User id is mandatory")
-    private long userId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private User user;
 
     public Link() {
 
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getFullLink() {
@@ -58,36 +68,17 @@ public class Link {
         this.id = id;
     }
 
-    public long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
-        Link that = (Link) o;
-
-        if (id != that.id) return false;
-        if (userId != that.userId) return false;
-        if (fullLink != null ? !fullLink.equals(that.fullLink) : that.fullLink != null) return false;
-        if (shortLink != null ? !shortLink.equals(that.shortLink) : that.shortLink != null) return false;
-
-        return true;
+        Link link = (Link) o;
+        return id == link.id;
     }
 
     @Override
     public int hashCode() {
-        int result = fullLink != null ? fullLink.hashCode() : 0;
-        result = 31 * result + (shortLink != null ? shortLink.hashCode() : 0);
-        result = 31 * result + (int) (id ^ (id >>> 32));
-        result = 31 * result + (int) (userId ^ (userId >>> 32));
-        return result;
+        return Objects.hash(id);
     }
 
     @Override
@@ -96,7 +87,6 @@ public class Link {
                 "fullLink='" + fullLink + '\'' +
                 ", shortLink='" + shortLink + '\'' +
                 ", id=" + id +
-                ", userId=" + userId +
                 '}';
     }
 }
