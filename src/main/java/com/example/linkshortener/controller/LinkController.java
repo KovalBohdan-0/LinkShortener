@@ -28,12 +28,12 @@ public class LinkController {
         linkService.removeAllLinks();
     }
 
-    @PostMapping("/link")
+    @PostMapping("/links")
     public void addLink(@Valid @RequestBody Link link) {
         linkService.addLink(link);
     }
 
-    @DeleteMapping("/link/{id}")
+    @DeleteMapping("/links/{id}")
     public void removeLink(@PathVariable Long id) {
         linkService.removeLink(id);
     }
