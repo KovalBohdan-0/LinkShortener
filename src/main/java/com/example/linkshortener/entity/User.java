@@ -20,11 +20,15 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy="user", fetch = FetchType.LAZY)
     private Set<Link> links;
+    public User() {
+
+    }
 
     public User(String email, String password) {
         this.email = email;
         this.password = password;
     }
+
 
     public Set<Link> getLinks() {
         return links;

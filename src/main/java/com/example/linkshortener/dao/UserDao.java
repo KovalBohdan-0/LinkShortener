@@ -1,13 +1,11 @@
 package com.example.linkshortener.dao;
 
 import com.example.linkshortener.entity.User;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
@@ -35,8 +33,9 @@ public class UserDao implements Dao<User>{
         List<User> list = query.getResultList();
 
         if (list.size() == 0) {
-            LOGGER.error("User with this email was not found :" + username);
-            throw new UsernameNotFoundException("User with this email was not found :" + username);
+            LOGGER.info("User with this email was not found :" + username);
+            //TODO make optional maybe
+            return null;
         }
 
         return list.get(0);

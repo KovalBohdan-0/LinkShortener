@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.Objects;
 
 @Entity
-@Table(name = "links", schema = "public", catalog = "link_shortener")
+@Table(name = "links", schema = "public")
 public class Link {
     @Basic
     @NotBlank(message = "Full link is mandatory")
@@ -34,6 +34,17 @@ public class Link {
 
     public Link() {
 
+    }
+
+    public Link(String fullLink, String shortLink) {
+        this.fullLink = fullLink;
+        this.shortLink = shortLink;
+    }
+
+    public Link(String fullLink, String shortLink, User user) {
+        this.fullLink = fullLink;
+        this.shortLink = shortLink;
+        this.user = user;
     }
 
     public User getUser() {

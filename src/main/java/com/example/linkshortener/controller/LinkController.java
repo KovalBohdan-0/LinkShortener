@@ -28,6 +28,7 @@ public class LinkController {
         linkService.removeAllLinks();
     }
 
+    //TODO add dto class
     @PostMapping("/links")
     public void addLink(@Valid @RequestBody Link link) {
         linkService.addLink(link);
