@@ -20,6 +20,10 @@ public class User {
     @JsonIgnore
     @OneToMany(mappedBy="user", fetch = FetchType.LAZY)
     private Set<Link> links;
+    @ManyToMany
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Group> roles;
+
     public User() {
 
     }
@@ -29,6 +33,13 @@ public class User {
         this.password = password;
     }
 
+    public Set<Group> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Group> roles) {
+        this.roles = roles;
+    }
 
     public Set<Link> getLinks() {
         return links;
@@ -73,5 +84,14 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", id=" + id +
+                '}';
     }
 }

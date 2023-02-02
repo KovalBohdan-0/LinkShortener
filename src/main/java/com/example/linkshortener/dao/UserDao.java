@@ -28,7 +28,7 @@ public class UserDao implements Dao<User>{
     }
 
     public User getByUsername(String username) {
-        TypedQuery<User> query = entityManager.createQuery("FROM users u WHERE u.email = :email ", User.class);
+        TypedQuery<User> query = entityManager.createQuery("FROM users user WHERE user.email = :email ", User.class);
         query.setParameter("email", username);
         List<User> list = query.getResultList();
 
@@ -43,7 +43,7 @@ public class UserDao implements Dao<User>{
 
     @Override
     public List<User> getAll() {
-        return entityManager.createQuery( "from users", User.class ).getResultList();
+        return entityManager.createQuery( "FROM users", User.class ).getResultList();
     }
 
     @Override

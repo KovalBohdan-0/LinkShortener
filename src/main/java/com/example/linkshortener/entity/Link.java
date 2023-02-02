@@ -17,6 +17,10 @@ import java.util.Objects;
 @Entity
 @Table(name = "links", schema = "public")
 public class Link {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @Column(name = "id")
+    private long id;
     @Basic
     @NotBlank(message = "Full link is mandatory")
     @Column(name = "full_link")
@@ -25,10 +29,6 @@ public class Link {
     @NotBlank(message = "Short link is mandatory")
     @Column(name = "short_link")
     private String shortLink;
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "id")
-    private long id;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
 

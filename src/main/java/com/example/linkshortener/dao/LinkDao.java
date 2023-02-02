@@ -1,7 +1,6 @@
 package com.example.linkshortener.dao;
 
 import com.example.linkshortener.entity.Link;
-import com.example.linkshortener.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-//TODO make one implementation
 @Repository
 public class LinkDao implements Dao<Link> {
 
@@ -31,7 +29,7 @@ public class LinkDao implements Dao<Link> {
     }
 
     public Optional<Link> getLinkByShortLink(String shortLink) {
-        TypedQuery<Link> query = entityManager.createQuery("FROM Link u WHERE u.shortLink = :shortLink ", Link.class);
+        TypedQuery<Link> query = entityManager.createQuery("FROM Link link WHERE link.shortLink = :shortLink ", Link.class);
         query.setParameter("shortLink", shortLink);
         List<Link> list = query.getResultList();
 
@@ -45,7 +43,7 @@ public class LinkDao implements Dao<Link> {
 
     @Override
     public List<Link> getAll() {
-        return entityManager.createQuery( "from Link", Link.class )
+        return entityManager.createQuery( "FROM Link", Link.class )
                 .getResultList();
     }
 
