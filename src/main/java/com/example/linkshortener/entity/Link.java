@@ -1,5 +1,6 @@
 package com.example.linkshortener.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -29,6 +30,7 @@ public class Link {
     @NotBlank(message = "Short link is mandatory")
     @Column(name = "short_link")
     private String shortLink;
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
 

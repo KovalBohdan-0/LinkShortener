@@ -49,8 +49,7 @@ public class GroupDao implements Dao<Group> {
     }
 
     public Set<Group> getGroupsByUserId(long id) {
-        //TODO make method
-        Query query = entityManager.createQuery("FROM roles role WHERE role.users = :user_id", Group.class).setParameter("user_id", id);
+        Query query = entityManager.createQuery("SELECT roles,user FROM roles role JOIN FETCH role.users user WHERE user.id =: user_id", Group.class).setParameter("user_id", id);
         Set<Group> userGroups = new HashSet<>(query.getResultList());
         LOGGER.info("Founded user with user groups: " + userGroups);
         return userGroups;

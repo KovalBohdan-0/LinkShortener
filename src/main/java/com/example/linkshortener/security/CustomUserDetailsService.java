@@ -38,8 +38,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private Collection<GrantedAuthority> getAuthorities(User user) {
-        Set<Group> userGroups = user.getRoles();
-                //groupDao.getGroupsByUserId(user.getId());
+        Set<Group> userGroups = groupDao.getGroupsByUserId(user.getId());
         Collection<GrantedAuthority> authorities = new ArrayList<>(userGroups.size());
 
         for (Group userGroup : userGroups) {
