@@ -25,6 +25,10 @@ public class UserService {
     private final GroupDao groupDao;
     private final JwtService jwtService;
     private final static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    private enum UserGroup {
+            USER,
+            ADMIN;
+    }
 
     public UserService(UserDao userDao, GroupDao groupDao, JwtService jwtService) {
         this.userDao = userDao;
@@ -42,16 +46,23 @@ public class UserService {
 
     @Transactional
     public void addUser(User user) {
+        addGroupToUser(user, UserGroup.ADMIN);
+        userDao.save(user);
+    }
+
+    @Transactional
+    public void addGroupToUser(User user, UserGroup group) {
         Set<Group> groups = new HashSet<>();
 
         if (user.getRoles() != null) {
             groups.addAll(user.getRoles());
         }
 
-        LOGGER.info("Adding user with groups: " + groups + " and Role:" + groupDao.getByCode("USER").get());
-        groupDao.getByCode("USER").ifPresent(groups::add);
+        String role = group.toString();
+
+        LOGGER.info("Adding user with groups: " + groups + " and Role:" + groupDao.getByCode(role).get());
+        groupDao.getByCode(role).ifPresent(groups::add);
         user.setRoles(groups);
-        userDao.save(user);
     }
 
     public AuthenticationResponse getRegistrationResponse(User user) {

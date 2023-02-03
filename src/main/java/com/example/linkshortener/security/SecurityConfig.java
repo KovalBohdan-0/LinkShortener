@@ -2,6 +2,7 @@ package com.example.linkshortener.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -29,11 +30,9 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                                //TODO delete comments
-//                        .requestMatchers(HttpMethod.DELETE, "/api/users").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/links").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users").hasAuthority("ADMIN")
                         .requestMatchers("/api/links").authenticated()
-                                .anyRequest().permitAll()
+                        .anyRequest().permitAll()
                 )
                 .formLogin()
                 .loginPage("/todo")
