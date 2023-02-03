@@ -43,12 +43,6 @@ public class Link {
         this.shortLink = shortLink;
     }
 
-    public Link(String fullLink, String shortLink, User user) {
-        this.fullLink = fullLink;
-        this.shortLink = shortLink;
-        this.user = user;
-    }
-
     public User getUser() {
         return user;
     }

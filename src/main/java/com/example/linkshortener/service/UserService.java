@@ -25,9 +25,9 @@ public class UserService {
     private final GroupDao groupDao;
     private final JwtService jwtService;
     private final static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-    private enum UserGroup {
+    public enum UserGroup {
             USER,
-            ADMIN;
+            ADMIN
     }
 
     public UserService(UserDao userDao, GroupDao groupDao, JwtService jwtService) {
@@ -45,12 +45,11 @@ public class UserService {
     }
 
     @Transactional
-    public void addUser(User user) {
-        addGroupToUser(user, UserGroup.ADMIN);
+    public void addUser(User user, UserGroup userGroup) {
+        addGroupToUser(user, userGroup);
         userDao.save(user);
     }
 
-    @Transactional
     public void addGroupToUser(User user, UserGroup group) {
         Set<Group> groups = new HashSet<>();
 
@@ -60,7 +59,7 @@ public class UserService {
 
         String role = group.toString();
 
-        LOGGER.info("Adding user with groups: " + groups + " and Role:" + groupDao.getByCode(role).get());
+        LOGGER.info("Adding user with groups: " + groups + " and Role:" + groupDao.getByCode(role).orElse(new Group("Not found", "")));
         groupDao.getByCode(role).ifPresent(groups::add);
         user.setRoles(groups);
     }

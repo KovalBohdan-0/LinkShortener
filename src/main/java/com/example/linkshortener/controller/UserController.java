@@ -27,7 +27,13 @@ public class UserController {
 
     @PostMapping("/users")
     public AuthenticationResponse register(@RequestBody User user) {
-        userService.addUser(user);
+        userService.addUser(user, UserService.UserGroup.USER);
+        return userService.getRegistrationResponse(user);
+    }
+
+    @PostMapping("/users/admin")
+    public AuthenticationResponse registerAdmin(@RequestBody User user) {
+        userService.addUser(user, UserService.UserGroup.ADMIN);
         return userService.getRegistrationResponse(user);
     }
 

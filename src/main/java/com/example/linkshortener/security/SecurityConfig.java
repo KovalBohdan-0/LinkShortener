@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.DELETE, "/api/users").hasAuthority("ADMIN")
+                        .requestMatchers("/api/users/admin").hasAuthority("ADMIN")
                         .requestMatchers("/api/links").authenticated()
                         .anyRequest().permitAll()
                 )

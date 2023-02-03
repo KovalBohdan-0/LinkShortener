@@ -48,9 +48,10 @@ public class GroupDao implements Dao<Group> {
                 .getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public Set<Group> getGroupsByUserId(long id) {
         Query query = entityManager.createQuery("SELECT role FROM roles role JOIN FETCH role.users user WHERE user.id =: user_id", Group.class).setParameter("user_id", id);
-        Set<Group> userGroups = new HashSet<>(query.getResultList());
+        Set<Group> userGroups = new HashSet<Group>(query.getResultList());
         LOGGER.info("Founded user with user groups: " + userGroups);
         return userGroups;
     }
