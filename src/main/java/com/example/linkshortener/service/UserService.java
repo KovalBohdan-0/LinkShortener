@@ -10,6 +10,7 @@ import com.example.linkshortener.security.AuthenticationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,16 +25,18 @@ public class UserService {
     private final UserDao userDao;
     private final GroupDao groupDao;
     private final JwtService jwtService;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     public enum UserGroup {
             USER,
             ADMIN
     }
 
-    public UserService(UserDao userDao, GroupDao groupDao, JwtService jwtService) {
+    public UserService(UserDao userDao, GroupDao groupDao, JwtService jwtService, BCryptPasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.groupDao = groupDao;
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<User> getAllUsers() {
@@ -45,9 +48,12 @@ public class UserService {
     }
 
     @Transactional
-    public void addUser(User user, UserGroup userGroup) {
+    public boolean addUser(User user, UserGroup userGroup) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         addGroupToUser(user, userGroup);
         userDao.save(user);
+
+        return true;
     }
 
     public void addGroupToUser(User user, UserGroup group) {
@@ -67,6 +73,7 @@ public class UserService {
     public AuthenticationResponse getRegistrationResponse(User user) {
         UserDetails userDetails = new CustomUserDetails(user.getEmail(), user.getPassword());
         String jwt = jwtService.generateJwt(new HashMap<>(), userDetails);
+
         return new AuthenticationResponse(jwt);
     }
 

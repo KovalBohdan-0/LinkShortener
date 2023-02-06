@@ -31,25 +31,28 @@ public class LinkService {
         User user = userDao.getByUsername(authentication.getName());
         List<Link> links = new ArrayList<>(user.getLinks());
         LOGGER.info("All user links :" + links + " For user :" + user.getEmail());
+
         return links;
     }
 
     @Transactional
-    public void removeAllLinks() {
-        getAllLinks().forEach(link -> removeLink(link.getId()));
-    }
-
-    @Transactional
-    public void addLink(Link link) {
+    public boolean addLink(Link link) {
         //TODO add links for anonymous users
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         link.setUser(userDao.getByUsername(authentication.getName()));
         linkDao.save(link);
         LOGGER.info("Saved link :" + link);
+
+        return true;
     }
 
     @Transactional
     public void removeLink(Long id) {
         linkDao.get(id).ifPresent(linkDao::delete);
+    }
+
+    @Transactional
+    public void removeAllLinks() {
+        getAllLinks().forEach(link -> removeLink(link.getId()));
     }
 }

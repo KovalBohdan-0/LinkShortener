@@ -35,6 +35,7 @@ public class LinkDao implements Dao<Link> {
 
         if (list.size() == 0) {
             LOGGER.info("Link with this short link was not found :" + shortLink);
+
             return Optional.empty();
         }
 

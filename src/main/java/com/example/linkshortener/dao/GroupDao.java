@@ -36,6 +36,7 @@ public class GroupDao implements Dao<Group> {
 
         if (groupList.size() == 0) {
             LOGGER.info("Group with this code was not found :" + code);
+
             return Optional.empty();
         }
 
@@ -53,6 +54,7 @@ public class GroupDao implements Dao<Group> {
         Query query = entityManager.createQuery("SELECT role FROM roles role JOIN FETCH role.users user WHERE user.id =: user_id", Group.class).setParameter("user_id", id);
         Set<Group> userGroups = new HashSet<Group>(query.getResultList());
         LOGGER.info("Founded user with user groups: " + userGroups);
+
         return userGroups;
     }
 

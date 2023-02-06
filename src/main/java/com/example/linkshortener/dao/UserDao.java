@@ -6,7 +6,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -34,7 +33,6 @@ public class UserDao implements Dao<User>{
 
         if (list.size() == 0) {
             LOGGER.info("User with this email was not found :" + username);
-            //TODO make optional maybe
             return null;
         }
 
@@ -48,8 +46,6 @@ public class UserDao implements Dao<User>{
 
     @Override
     public void save(User user) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         entityManager.persist(user);
     }
 

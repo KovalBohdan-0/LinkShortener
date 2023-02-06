@@ -46,11 +46,6 @@ class GroupDaoTest {
     }
 
     @Test
-    void shouldGetGroupByUserId() {
-
-    }
-
-    @Test
     void shouldGetAllGroups() {
         groupDao.save(new Group("Customer", "Customer role"));
         List<Group> groups = groupDao.getAll();

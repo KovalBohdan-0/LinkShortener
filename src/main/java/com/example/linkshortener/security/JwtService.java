@@ -48,12 +48,14 @@ public class JwtService {
                     .getBody();
         } catch (Exception e) {
             LOGGER.error("Bad JWT :" + jwt + e.getMessage());
+
             throw new JwtException("Bad JWT :" + jwt);
         }
     }
     
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SIGN_IN_SECRET);
+
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
