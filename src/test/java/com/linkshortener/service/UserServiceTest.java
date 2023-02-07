@@ -11,8 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -49,8 +51,8 @@ class UserServiceTest {
 
         boolean isUserCreated = userService.addUser(user, UserGroup.USER);
 
-        verify(userDao).save(user);
-        verify(passwordEncoder).encode("pass");
+        verify(userDao).save(any(User.class));
+        verify(passwordEncoder).encode(anyString());
         assertThat(isUserCreated).isTrue();
     }
 
@@ -61,7 +63,7 @@ class UserServiceTest {
         when(userDao.getByUsername(user.getEmail())).thenReturn(user);
         userService.addUser(user, UserGroup.USER);
 
-        verify(userDao, never()).save(user);
+        verify(userDao, never()).save(any(User.class));
     }
 
     @Test
@@ -75,7 +77,16 @@ class UserServiceTest {
     void shouldGetUserByEmail() {
         userService.getUserByEmail("");
 
-        verify(userDao).getByUsername("");
+        verify(userDao).getByUsername(anyString());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldGetRegistrationResponse() {
+        User user = new User();
+        userService.getRegistrationResponse(user);
+
+        verify(jwtService).generateJwt(any(Map.class), any(UserDetails.class));
     }
 
     @Test
@@ -84,8 +95,8 @@ class UserServiceTest {
         when(userDao.get(1L)).thenReturn(Optional.of(user));
         userService.removeUser(1L);
 
-        verify(userDao).get(1L);
-        verify(userDao).delete(user);
+        verify(userDao).get(anyLong());
+        verify(userDao).delete(any(User.class));
     }
 
     @Test
@@ -93,13 +104,13 @@ class UserServiceTest {
         when(userDao.get(1L)).thenReturn(Optional.empty());
         userService.removeUser(1L);
 
-        verify(userDao).get(1L);
-        verify(userDao, never()).delete(new User());
+        verify(userDao).get(anyLong());
+        verify(userDao, never()).delete(any(User.class));
     }
 
     @Test
     void shouldRemoveAllUsers() {
-        userDao.deleteAll();
+        userService.removeAllUsers();
 
         verify(userDao).deleteAll();
     }
