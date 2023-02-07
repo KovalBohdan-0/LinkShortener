@@ -4,6 +4,7 @@ import com.linkshortener.dao.GroupDao;
 import com.linkshortener.dao.UserDao;
 import com.linkshortener.entity.Group;
 import com.linkshortener.entity.User;
+import com.linkshortener.enums.UserGroup;
 import com.linkshortener.security.JwtService;
 import com.linkshortener.security.CustomUserDetails;
 import com.linkshortener.security.AuthenticationResponse;
@@ -22,15 +23,11 @@ import java.util.Set;
 @Service
 @Transactional(readOnly = true)
 public class UserService {
+    private final static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final UserDao userDao;
     private final GroupDao groupDao;
     private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-    public enum UserGroup {
-            USER,
-            ADMIN
-    }
 
     public UserService(UserDao userDao, GroupDao groupDao, JwtService jwtService, BCryptPasswordEncoder passwordEncoder) {
         this.userDao = userDao;
@@ -40,7 +37,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return  userDao.getAll();
+        return userDao.getAll();
     }
 
     public User getUserByEmail(String email) {
@@ -49,6 +46,10 @@ public class UserService {
 
     @Transactional
     public boolean addUser(User user, UserGroup userGroup) {
+        if (userDao.getByUsername(user.getEmail()) != null) {
+            return false;
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         addGroupToUser(user, userGroup);
         userDao.save(user);
@@ -79,7 +80,7 @@ public class UserService {
 
     @Transactional
     public void removeAllUsers() {
-        getAllUsers().forEach(user -> removeUser(user.getId()));
+        userDao.deleteAll();
     }
 
     @Transactional

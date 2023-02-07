@@ -53,6 +53,6 @@ public class LinkService {
 
     @Transactional
     public void removeAllLinks() {
-        getAllLinks().forEach(link -> removeLink(link.getId()));
+        linkDao.deleteAll();
     }
 }

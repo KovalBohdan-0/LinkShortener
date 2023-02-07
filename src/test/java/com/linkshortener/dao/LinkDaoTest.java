@@ -88,4 +88,14 @@ class LinkDaoTest {
 
         assertThat(deletedLinkIsFound).isFalse();
     }
+
+    @Test
+    void shouldDeleteAllLinks() {
+        linkDao.save(new Link("linkToDelete", "shortLinkToDelete"));
+        linkDao.deleteAll();
+
+        boolean isDeleted = linkDao.getAll().size() == 0;
+
+        assertThat(isDeleted).isTrue();
+    }
 }

@@ -1,6 +1,7 @@
 package com.linkshortener.controller;
 
 import com.linkshortener.entity.User;
+import com.linkshortener.enums.UserGroup;
 import com.linkshortener.security.AuthenticationResponse;
 import com.linkshortener.service.UserService;
 import org.slf4j.Logger;
@@ -30,14 +31,14 @@ public class UserController {
 
     @PostMapping("/users")
     public AuthenticationResponse register(@RequestBody User user) {
-        userService.addUser(user, UserService.UserGroup.USER);
+        userService.addUser(user, UserGroup.USER);
 
         return userService.getRegistrationResponse(user);
     }
 
     @PostMapping("/users/admin")
     public AuthenticationResponse registerAdmin(@RequestBody User user) {
-        userService.addUser(user, UserService.UserGroup.ADMIN);
+        userService.addUser(user, UserGroup.ADMIN);
 
         return userService.getRegistrationResponse(user);
     }

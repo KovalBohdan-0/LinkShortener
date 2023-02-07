@@ -72,4 +72,10 @@ public class GroupDao implements Dao<Group> {
     public void delete(Group group) {
         entityManager.remove(group);
     }
+
+    @Override
+    public void deleteAll() {
+        Query query = entityManager.createQuery("DELETE FROM roles");
+        query.executeUpdate();
+    }
 }

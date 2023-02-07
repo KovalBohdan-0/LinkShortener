@@ -1,6 +1,7 @@
 package com.linkshortener.dao;
 
 import com.linkshortener.entity.Group;
+import com.linkshortener.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,16 +9,17 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(GroupDao.class)
+@Import({GroupDao.class, UserDao.class})
 class GroupDaoTest {
     @Autowired
     private GroupDao groupDao;
+    @Autowired
+    private UserDao userDao;
 
     @BeforeEach
     @Rollback(false)
@@ -42,6 +44,28 @@ class GroupDaoTest {
         boolean isFound = group.isPresent();
 
         assertThat(isFound).isTrue();
+    }
+
+    @Test
+    void shouldNotGetGroupByNotExistingCode() {
+        Optional<Group> group = groupDao.getByCode("Not present");
+
+        boolean isNotFound = group.isEmpty();
+
+        assertThat(isNotFound).isTrue();
+    }
+
+    @Test
+    void shouldGetGroupByUserId() {
+        User user = new User("email", "pass");
+        user.setRoles(Set.of(groupDao.getByCode("Manager").orElseThrow()));
+        userDao.save(user);
+        long userId = userDao.getByUsername("email").getId();
+        Set<Group> foundGroups = groupDao.getGroupsByUserId(userId);
+
+        boolean groupIsFound = foundGroups.contains(groupDao.getByCode("Manager").orElseThrow());
+
+        assertThat(groupIsFound).isTrue();
     }
 
     @Test
@@ -87,6 +111,16 @@ class GroupDaoTest {
         boolean deletedGroupIsNotPresent = deletedUser.isEmpty();
 
         assertThat(deletedGroupIsNotPresent).isTrue();
+    }
+
+    @Test
+    void shouldDeleteAllRoles() {
+        groupDao.save(new Group("deleteAll", "to delete all"));
+        groupDao.deleteAll();
+
+        boolean isDeleted = groupDao.getAll().size() == 0;
+
+        assertThat(isDeleted).isTrue();
     }
 
 }

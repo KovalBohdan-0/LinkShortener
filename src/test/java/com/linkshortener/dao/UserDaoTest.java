@@ -84,4 +84,14 @@ class UserDaoTest {
 
         assertThat(deletedUser).isNull();
     }
+
+    @Test
+    void shouldDeleteAllUsers() {
+        userDao.save(new User());
+        userDao.deleteAll();
+
+        boolean isDeleted = userDao.getAll().size() == 0;
+
+        assertThat(isDeleted).isTrue();
+    }
 }

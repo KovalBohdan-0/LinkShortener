@@ -3,6 +3,7 @@ package com.linkshortener.dao;
 import com.linkshortener.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,5 +58,11 @@ public class UserDao implements Dao<User>{
     @Override
     public void delete(User user) {
         entityManager.remove(user);
+    }
+
+    @Override
+    public void deleteAll() {
+        Query query = entityManager.createQuery("DELETE FROM users");
+        query.executeUpdate();
     }
 }

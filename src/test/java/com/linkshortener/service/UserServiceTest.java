@@ -3,18 +3,16 @@ package com.linkshortener.service;
 import com.linkshortener.dao.GroupDao;
 import com.linkshortener.dao.UserDao;
 import com.linkshortener.entity.User;
+import com.linkshortener.enums.UserGroup;
 import com.linkshortener.security.JwtService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -49,7 +47,7 @@ class UserServiceTest {
         User user = new User();
         user.setPassword("pass");
 
-        boolean isUserCreated = userService.addUser(user, UserService.UserGroup.USER);
+        boolean isUserCreated = userService.addUser(user, UserGroup.USER);
 
         verify(userDao).save(user);
         verify(passwordEncoder).encode("pass");
@@ -58,7 +56,12 @@ class UserServiceTest {
 
     @Test
     void shouldFailToAddExistingUser() {
+        User user = new User();
+        user.setEmail("email");
+        when(userDao.getByUsername(user.getEmail())).thenReturn(user);
+        userService.addUser(user, UserGroup.USER);
 
+        verify(userDao, never()).save(user);
     }
 
     @Test
@@ -78,7 +81,7 @@ class UserServiceTest {
     @Test
     void shouldRemoveUserById() {
         User user = new User();
-        when(userDao.get(1L)).thenReturn((Optional<User>) Optional.of(user));
+        when(userDao.get(1L)).thenReturn(Optional.of(user));
         userService.removeUser(1L);
 
         verify(userDao).get(1L);
@@ -86,12 +89,18 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldRemoveAllUsers() {
-        List<User> users = new ArrayList<>(List.of(new User()));
-        when(userDao.getAll()).thenReturn(users);
-        userService.removeAllUsers();
+    void shouldFailToRemoveNotExistingUser() {
+        when(userDao.get(1L)).thenReturn(Optional.empty());
+        userService.removeUser(1L);
 
-        verify(userDao).getAll();
-        verify(userDao).delete(new User());
+        verify(userDao).get(1L);
+        verify(userDao, never()).delete(new User());
+    }
+
+    @Test
+    void shouldRemoveAllUsers() {
+        userDao.deleteAll();
+
+        verify(userDao).deleteAll();
     }
 }

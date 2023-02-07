@@ -3,6 +3,7 @@ package com.linkshortener.dao;
 import com.linkshortener.entity.Link;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,5 +62,11 @@ public class LinkDao implements Dao<Link> {
     @Override
     public void delete(Link link) {
         entityManager.remove(link);
+    }
+
+    @Override
+    public void deleteAll() {
+        Query query = entityManager.createQuery("DELETE FROM Link");
+        query.executeUpdate();
     }
 }
