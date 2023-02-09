@@ -2,23 +2,18 @@ package com.linkshortener.service;
 
 import com.linkshortener.dao.LinkDao;
 import com.linkshortener.dao.UserDao;
+import com.linkshortener.entity.Link;
 import com.linkshortener.entity.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.test.context.support.WithMockUser;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 
@@ -29,12 +24,19 @@ class LinkServiceTest {
     private LinkDao linkDao;
     @Mock
     private UserDao userDao;
+    @Mock
+    private SecurityContext securityContext;
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private User user;
     private AutoCloseable autoCloseable;
 
     @BeforeEach
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
         linkService = new LinkService(linkDao, userDao);
+        SecurityContextHolder.setContext(securityContext);
     }
 
     @AfterEach
@@ -43,29 +45,67 @@ class LinkServiceTest {
     }
 
     @Test
-    void getAllLinks() {
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-
-        // Create mock Authentication
-        Authentication authentication = Mockito.mock(Authentication.class);
-
-        // Set authentication in the SecurityContext
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-
-        // Set SecurityContext in the SecurityContextHolder
-        SecurityContextHolder.setContext(securityContext);
-//        User user = Mockito.mock(User.class);
-//        when(user.getLinks()).thenReturn(any(Set.class));
-
+    void shouldGetAllLinks() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userDao.getByUsername(authentication.getName())).thenReturn(user);
         linkService.getAllLinks();
 
-        verify(userDao).getByUsername(anyString());
+        verify(userDao).getByUsername(any());
+        verify(user).getLinks();
     }
 
-    private SecurityContext getDesiredSecurityContext(String authority) {
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(authority));
-        SecurityContext securityContext = new SecurityContextImpl();
-        securityContext.setAuthentication(new TestingAuthenticationToken(null, null, String.valueOf(authorities)));
-        return securityContext;
+    @Test
+    void shouldNotGetAllLinksWhenNotAuthenticated() {
+        when(securityContext.getAuthentication()).thenReturn(null);
+        linkService.getAllLinks();
+
+        verify(userDao, never()).getByUsername(any());
+        verify(user, never()).getLinks();
+    }
+
+    @Test
+    void shouldAddLink() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userDao.getByUsername(authentication.getName())).thenReturn(user);
+        linkService.addLink(new Link("link", "shortLink"));
+
+        verify(userDao).getByUsername(any());
+        verify(linkDao).save(any(Link.class));
+    }
+
+    @Test
+    void shouldRemoveLink() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userDao.getByUsername(authentication.getName())).thenReturn(user);
+        when(linkDao.get(anyLong())).thenReturn(Optional.of(new Link()));
+        linkService.removeLink(1L);
+
+        verify(linkDao).delete(any(Link.class));
+    }
+
+    @Test
+    void shouldNotRemoveLinkWhenNotAuthenticated() {
+        when(securityContext.getAuthentication()).thenReturn(null);
+        linkService.removeLink(1L);
+
+        verify(linkDao, never()).delete(any(Link.class));
+    }
+
+    @Test
+    void shouldRemoveAllLinks() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userDao.getByUsername(authentication.getName())).thenReturn(user);
+        linkService.removeAllLinks();
+
+        verify(userDao).getByUsername(any());
+        verify(linkDao).deleteAllByUserId(anyLong());
+    }
+
+    @Test
+    void shouldNotRemoveAllLinksWhenNotAuthenticated() {
+        when(securityContext.getAuthentication()).thenReturn(null);
+        linkService.removeAllLinks();
+
+        verify(linkDao, never()).deleteAll();
     }
 }

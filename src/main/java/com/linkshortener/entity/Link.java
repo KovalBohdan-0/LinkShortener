@@ -31,7 +31,7 @@ public class Link {
     @Column(name = "short_link")
     private String shortLink;
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     public Link() {
