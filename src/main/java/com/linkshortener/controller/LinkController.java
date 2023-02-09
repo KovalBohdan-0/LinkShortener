@@ -23,11 +23,6 @@ public class LinkController {
         return linkService.getAllLinks();
     }
 
-    @DeleteMapping("/links")
-    public void removeLinks() {
-        linkService.removeAllLinks();
-    }
-
     //TODO add dto class
     @PostMapping("/links")
     public void addLink(@Valid @RequestBody Link link) {
@@ -39,4 +34,8 @@ public class LinkController {
         linkService.removeLink(id);
     }
 
+    @DeleteMapping("/links")
+    public void removeLinks() {
+        linkService.removeAllLinks();
+    }
 }

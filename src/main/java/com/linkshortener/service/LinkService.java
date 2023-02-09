@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,9 +29,18 @@ public class LinkService {
 
     public List<Link> getAllLinks() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userDao.getByUsername(authentication.getName());
-        List<Link> links = new ArrayList<>(user.getLinks());
-        LOGGER.info("All user links :" + links + " For user :" + user.getEmail());
+        List<Link> links = new ArrayList<>();
+
+        if (authentication != null) {
+            User user = userDao.getByUsername(authentication.getName());
+            Set<Link> foundLinks = user.getLinks();
+
+            if (foundLinks != null && foundLinks.size() > 0) {
+                links.addAll(user.getLinks());
+            }
+
+            LOGGER.info("All user links :" + links + " For user :" + user.getEmail());
+        }
 
         return links;
     }
@@ -48,11 +58,20 @@ public class LinkService {
 
     @Transactional
     public void removeLink(Long id) {
-        linkDao.get(id).ifPresent(linkDao::delete);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            linkDao.get(id).ifPresent(linkDao::delete);
+        }
     }
 
     @Transactional
     public void removeAllLinks() {
-        linkDao.deleteAll();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            User user = userDao.getByUsername(authentication.getName());
+            linkDao.deleteAllByUserId(user.getId());
+        }
     }
 }
