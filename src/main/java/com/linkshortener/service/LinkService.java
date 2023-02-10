@@ -58,11 +58,7 @@ public class LinkService {
 
     @Transactional
     public void removeLink(Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null) {
-            linkDao.get(id).ifPresent(linkDao::delete);
-        }
+        linkDao.get(id).ifPresent(linkDao::delete);
     }
 
     @Transactional

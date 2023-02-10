@@ -75,20 +75,10 @@ class LinkServiceTest {
 
     @Test
     void shouldRemoveLink() {
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userDao.getByUsername(authentication.getName())).thenReturn(user);
         when(linkDao.get(anyLong())).thenReturn(Optional.of(new Link()));
         linkService.removeLink(1L);
 
         verify(linkDao).delete(any(Link.class));
-    }
-
-    @Test
-    void shouldNotRemoveLinkWhenNotAuthenticated() {
-        when(securityContext.getAuthentication()).thenReturn(null);
-        linkService.removeLink(1L);
-
-        verify(linkDao, never()).delete(any(Link.class));
     }
 
     @Test
