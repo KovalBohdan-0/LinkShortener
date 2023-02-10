@@ -6,6 +6,7 @@ import com.linkshortener.security.AuthenticationResponse;
 import com.linkshortener.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
@@ -43,15 +44,16 @@ public class UserController {
         return userService.getRegistrationResponse(user);
     }
 
-    @DeleteMapping("/users")
-    public void deleteUsers() {
-        userService.removeAllUsers();
-    }
-
     @PostMapping("/login")
     public AuthenticationResponse login(@RequestBody User user) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
         User foundedUser = userService.getUserByEmail(user.getEmail());
+
         return userService.getRegistrationResponse(foundedUser);
+    }
+
+    @DeleteMapping("/users")
+    public void deleteUsers() {
+        userService.removeAllUsers();
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,8 +32,10 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.DELETE, "/api/users").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasAuthority("ADMIN")
                         .requestMatchers("/api/users/admin").hasAuthority("ADMIN")
-                        .requestMatchers("/api/links").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/links").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/links").authenticated()
                         .anyRequest().permitAll()
                 )
                 .formLogin()
