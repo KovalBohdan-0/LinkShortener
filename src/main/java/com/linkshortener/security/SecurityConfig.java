@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/admin").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/links").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/links").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/links/{id}").authenticated()
                         .anyRequest().permitAll()
                 )
                 .formLogin()
