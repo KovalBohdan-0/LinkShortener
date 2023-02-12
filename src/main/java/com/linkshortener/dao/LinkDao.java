@@ -29,13 +29,13 @@ public class LinkDao implements Dao<Link> {
         return Optional.ofNullable(entityManager.find(Link.class, id));
     }
 
-    public Optional<Link> getLinkByShortLink(String shortLink) {
-        TypedQuery<Link> query = entityManager.createQuery("FROM Link link WHERE link.shortLink = :shortLink ", Link.class);
-        query.setParameter("shortLink", shortLink);
+    public Optional<Link> getLinkByShortLink(String alias) {
+        TypedQuery<Link> query = entityManager.createQuery("FROM Link link WHERE link.alias = :alias ", Link.class);
+        query.setParameter("alias", alias);
         List<Link> list = query.getResultList();
 
         if (list.size() == 0) {
-            LOGGER.info("Link with this short link was not found :" + shortLink);
+            LOGGER.info("Link with this alias was not found :" + alias);
 
             return Optional.empty();
         }

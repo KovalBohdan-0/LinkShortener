@@ -45,6 +45,13 @@ class LinkServiceTest {
     }
 
     @Test
+    void shouldGetLinkByShortLink() {
+        linkService.getLinkByShortLink(anyString());
+
+        verify(linkDao).getLinkByShortLink(anyString());
+    }
+
+    @Test
     void shouldGetAllLinks() {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(userDao.getByUsername(authentication.getName())).thenReturn(user);
@@ -67,7 +74,7 @@ class LinkServiceTest {
     void shouldAddLink() {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(userDao.getByUsername(authentication.getName())).thenReturn(user);
-        linkService.addLink(new Link("link", "shortLink"));
+        linkService.addLink(new Link("link", "alias"));
 
         verify(userDao).getByUsername(any());
         verify(linkDao).save(any(Link.class));

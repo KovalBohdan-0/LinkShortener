@@ -44,7 +44,7 @@ class LinkControllerTest {
     void shouldAddLink() throws Exception {
         this.mockMvc.perform(post("/api/links")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"shortLink\":  \"linkShortener.com/youtube\"}")).andExpect(status().isOk());
+                .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"alias\":  \"linkShortener.com/youtube\"}")).andExpect(status().isOk());
 
         verify(linkController).addLink(any());
     }

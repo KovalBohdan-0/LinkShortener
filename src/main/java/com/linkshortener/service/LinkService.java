@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -25,6 +26,10 @@ public class LinkService {
     public LinkService(LinkDao linkDao, UserDao userDao) {
         this.linkDao = linkDao;
         this.userDao = userDao;
+    }
+
+    public Optional<Link> getLinkByShortLink(String alias) {
+        return linkDao.getLinkByShortLink(alias);
     }
 
     public List<Link> getAllLinks() {
