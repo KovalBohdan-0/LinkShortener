@@ -2,7 +2,6 @@ package com.linkshortener.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,9 +26,9 @@ public class Link {
     @Column(name = "full_link")
     private String fullLink;
     @Basic
-    @NotBlank(message = "Short link is mandatory")
-    @Column(name = "short_link")
-    private String shortLink;
+    @NotBlank(message = "Alias is mandatory")
+    @Column(name = "alias")
+    private String alias;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -38,9 +37,9 @@ public class Link {
 
     }
 
-    public Link(String fullLink, String shortLink) {
+    public Link(String fullLink, String alias) {
         this.fullLink = fullLink;
-        this.shortLink = shortLink;
+        this.alias = alias;
     }
 
     public User getUser() {
@@ -59,12 +58,12 @@ public class Link {
         this.fullLink = fullLink;
     }
 
-    public String getShortLink() {
-        return shortLink;
+    public String getAlias() {
+        return alias;
     }
 
-    public void setShortLink(String shortLink) {
-        this.shortLink = shortLink;
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public long getId() {
@@ -92,7 +91,7 @@ public class Link {
     public String toString() {
         return "Link{" +
                 "fullLink='" + fullLink + '\'' +
-                ", shortLink='" + shortLink + '\'' +
+                ", alias='" + alias + '\'' +
                 ", id=" + id +
                 '}';
     }

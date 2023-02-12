@@ -69,7 +69,7 @@ class LinkDaoTest {
     @Test
     void shouldUpdateLink() {
         Optional<Link> link = linkDao.getLinkByShortLink("service/t.com");
-        link.get().setShortLink("updatedLink");
+        link.get().setAlias("updatedLink");
         linkDao.update(link.get());
 
         boolean updatedLinkIsFound = linkDao.getLinkByShortLink("updatedLink").isPresent();
