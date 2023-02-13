@@ -32,7 +32,7 @@ public class LinkService {
         return linkDao.get(id);
     }
 
-    public Optional<Link> getLinkByShortLink(String alias) {
+    public Optional<Link> getLinkByAlias(String alias) {
         return linkDao.getLinkByShortLink(alias);
     }
 

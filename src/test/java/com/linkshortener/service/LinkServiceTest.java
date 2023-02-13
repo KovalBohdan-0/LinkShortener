@@ -53,7 +53,7 @@ class LinkServiceTest {
 
     @Test
     void shouldGetLinkByShortLink() {
-        linkService.getLinkByShortLink(anyString());
+        linkService.getLinkByAlias(anyString());
 
         verify(linkDao).getLinkByShortLink(anyString());
     }

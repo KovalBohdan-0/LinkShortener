@@ -30,7 +30,7 @@ public class LinkController {
 
     @GetMapping("/{alias}")
     public ResponseEntity<HttpHeaders> redirectToUrl(@PathVariable String alias) {
-        Optional<Link> link = linkService.getLinkByShortLink(alias);
+        Optional<Link> link = linkService.getLinkByAlias(alias);
 
         if (link.isPresent()) {
             HttpHeaders headers = new HttpHeaders();
@@ -54,12 +54,20 @@ public class LinkController {
     }
 
     @PostMapping("/api/links")
-    public void addLink(@Valid @RequestBody LinkDto linkDto) {
-        linkService.addLink(convertToLink(linkDto));
+    public ResponseEntity<Void> addLink(@Valid @RequestBody LinkDto linkDto) {
+        Link link = convertToLink(linkDto);
+
+        if (linkService.getLinkByAlias(link.getAlias()).isEmpty()) {
+            linkService.addLink(link);
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @DeleteMapping("/api/links/{id}")
-    public ResponseEntity removeLink(@PathVariable Long id) {
+    public ResponseEntity<Void> removeLink(@PathVariable Long id) {
         Optional<Link> link = linkService.getLinkById(id);
 
         if (link.isPresent()) {
