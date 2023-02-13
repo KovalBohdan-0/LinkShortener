@@ -1,6 +1,5 @@
 package com.linkshortener.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Objects;
@@ -17,7 +16,6 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @JsonIgnore
     @OneToMany(mappedBy="user", cascade = CascadeType.ALL)
     private Set<Link> links;
     @ManyToMany
