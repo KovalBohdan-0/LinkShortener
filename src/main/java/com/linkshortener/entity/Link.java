@@ -22,14 +22,11 @@ public class Link {
     @Column(name = "id")
     private long id;
     @Basic
-    @NotBlank(message = "Full link is mandatory")
     @Column(name = "full_link")
     private String fullLink;
     @Basic
-    @NotBlank(message = "Alias is mandatory")
     @Column(name = "alias")
     private String alias;
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 

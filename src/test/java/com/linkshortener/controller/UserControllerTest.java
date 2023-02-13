@@ -55,6 +55,16 @@ class UserControllerTest {
     }
 
     @Test
+    void shouldNotRegisterInvalidUser() throws Exception {
+        this.mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"user@gmail.com\"}"))
+                .andExpect(status().isBadRequest());
+
+        verify(userService, never()).addUser(any(), any());
+    }
+
+    @Test
     @WithMockUser(username="admin", authorities = {"ADMIN"})
     void shouldRegisterAdmin() throws Exception {
         this.mockMvc.perform(post("/api/users/admin")
@@ -63,6 +73,18 @@ class UserControllerTest {
                 .andExpect(status().isOk());
 
         verify(userService).addUser(any(), any());
+    }
+
+
+    @Test
+    @WithMockUser(username="admin", authorities = {"ADMIN"})
+    void shouldNotRegisterInvalidAdmin() throws Exception {
+        this.mockMvc.perform(post("/api/users/admin")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"admin@gmail.com\"}"))
+                .andExpect(status().isBadRequest());
+
+        verify(userService, never()).addUser(any(), any());
     }
 
     @Test
@@ -101,5 +123,16 @@ class UserControllerTest {
 
         verify(authenticationManager).authenticate(any());
         verify(userService).getRegistrationResponse(any());
+    }
+
+    @Test
+    void shouldNotLoginToInvalidUser() throws Exception {
+        this.mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"user@gmail.com\"}"))
+                .andExpect(status().isBadRequest());
+
+        verify(authenticationManager, never()).authenticate(any());
+        verify(userService, never()).getRegistrationResponse(any());
     }
 }

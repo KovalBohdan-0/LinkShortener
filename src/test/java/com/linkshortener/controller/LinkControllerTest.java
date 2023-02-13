@@ -16,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//TODO add validation tests
 @SpringBootTest
 @AutoConfigureMockMvc
 class LinkControllerTest {
@@ -47,6 +46,15 @@ class LinkControllerTest {
                 .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"alias\":  \"linkShortener.com/youtube\"}")).andExpect(status().isOk());
 
         verify(linkController).addLink(any());
+    }
+
+    @Test
+    void shouldNotAddInvalidLink() throws Exception {
+        this.mockMvc.perform(post("/api/links")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"}")).andExpect(status().isBadRequest());
+
+        verify(linkController, never()).addLink(any());
     }
 
     @Test
