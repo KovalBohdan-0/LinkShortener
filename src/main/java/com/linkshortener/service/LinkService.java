@@ -28,6 +28,10 @@ public class LinkService {
         this.userDao = userDao;
     }
 
+    public Optional<Link> getLinkById(long id) {
+        return linkDao.get(id);
+    }
+
     public Optional<Link> getLinkByShortLink(String alias) {
         return linkDao.getLinkByShortLink(alias);
     }

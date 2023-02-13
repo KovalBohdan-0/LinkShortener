@@ -45,6 +45,13 @@ class LinkServiceTest {
     }
 
     @Test
+    void shouldGetLinkById() {
+        linkService.getLinkById(anyLong());
+
+        verify(linkDao).get(anyLong());
+    }
+
+    @Test
     void shouldGetLinkByShortLink() {
         linkService.getLinkByShortLink(anyString());
 

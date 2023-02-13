@@ -1,17 +1,22 @@
 package com.linkshortener.controller;
 
+import com.linkshortener.dto.UserDto;
 import com.linkshortener.entity.User;
 import com.linkshortener.enums.UserGroup;
 import com.linkshortener.security.AuthenticationResponse;
 import com.linkshortener.service.UserService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping("/api")
 public class UserController {
@@ -25,28 +30,28 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public List<User> getUsers() {
-        return userService.getAllUsers();
+    public List<UserDto> getUsers() {
+        return userService.getAllUsers().stream().map(this::convertToUserDto).collect(Collectors.toList());
     }
 
     @PostMapping("/users")
-    public AuthenticationResponse register(@RequestBody User user) {
-        userService.addUser(user, UserGroup.USER);
+    public AuthenticationResponse register(@Valid @RequestBody UserDto userDto) {
+        userService.addUser(convertToUser(userDto), UserGroup.USER);
 
-        return userService.getRegistrationResponse(user);
+        return userService.getRegistrationResponse(convertToUser(userDto));
     }
 
     @PostMapping("/users/admin")
-    public AuthenticationResponse registerAdmin(@RequestBody User user) {
-        userService.addUser(user, UserGroup.ADMIN);
+    public AuthenticationResponse registerAdmin(@Valid @RequestBody UserDto userDto) {
+        userService.addUser(convertToUser(userDto), UserGroup.ADMIN);
 
-        return userService.getRegistrationResponse(user);
+        return userService.getRegistrationResponse(convertToUser(userDto));
     }
 
     @PostMapping("/login")
-    public AuthenticationResponse login(@RequestBody User user) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
-        User foundedUser = userService.getUserByEmail(user.getEmail());
+    public AuthenticationResponse login(@Valid @RequestBody UserDto userDto) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
+        User foundedUser = userService.getUserByEmail(userDto.getEmail());
 
         return userService.getRegistrationResponse(foundedUser);
     }
@@ -54,5 +59,13 @@ public class UserController {
     @DeleteMapping("/users")
     public void deleteUsers() {
         userService.removeAllUsers();
+    }
+
+    private UserDto convertToUserDto(User user) {
+        return new UserDto(user.getEmail(), user.getPassword());
+    }
+
+    private User convertToUser(UserDto userDto) {
+        return new User(userDto.getEmail(), userDto.getPassword());
     }
 }
