@@ -55,14 +55,11 @@ public class LinkService {
     }
 
     @Transactional
-    public boolean addLink(Link link) {
-        //TODO add links for anonymous users
+    public void addLink(Link link) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         link.setUser(userDao.getByUsername(authentication.getName()));
         linkDao.save(link);
-        LOGGER.info("Saved link :" + link);
-
-        return true;
+        LOGGER.info("Saved link :" + link + " to user with username:" + link.getUser().getEmail());
     }
 
     @Transactional
