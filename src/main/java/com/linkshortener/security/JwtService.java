@@ -47,7 +47,7 @@ public class JwtService {
                     .parseClaimsJws(jwt)
                     .getBody();
         } catch (Exception e) {
-            LOGGER.error("Bad JWT :" + jwt + e.getMessage());
+            LOGGER.error("Bad JWT :{} {}", jwt, e.getMessage());
 
             throw new JwtException("Bad JWT :" + jwt);
         }

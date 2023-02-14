@@ -4,11 +4,18 @@ import com.linkshortener.dto.LinkDto;
 import com.linkshortener.entity.Link;
 import com.linkshortener.service.LinkService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +25,7 @@ import java.util.stream.Collectors;
 @RestController
 public class LinkController {
     private final LinkService linkService;
+    private final Logger LOGGER = LoggerFactory.getLogger(LinkController.class);
 
     public LinkController(LinkService linkService) {
         this.linkService = linkService;
@@ -40,6 +48,7 @@ public class LinkController {
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
         }
 
+        LOGGER.warn("Searched alias :{} of link does not exist", alias);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
@@ -58,6 +67,7 @@ public class LinkController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
+        LOGGER.warn("Link with alias :{} already exist", linkDto.getAlias());
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
@@ -71,6 +81,7 @@ public class LinkController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
+        LOGGER.warn("Searched link with id :{} does not exist", id);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
