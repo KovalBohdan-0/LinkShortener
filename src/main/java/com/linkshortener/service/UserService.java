@@ -66,7 +66,7 @@ public class UserService {
 
         String role = group.toString();
 
-        LOGGER.info("Adding user with groups: " + groups + " and Role:" + groupDao.getByCode(role).orElse(new Group("Not found", "")));
+        LOGGER.info("Adding user with groups :{} and Role :{}", groups, groupDao.getByCode(role).orElse(new Group("Not found", "")));
         groupDao.getByCode(role).ifPresent(groups::add);
         user.setRoles(groups);
     }

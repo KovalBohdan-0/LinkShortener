@@ -35,7 +35,7 @@ public class LinkDao implements Dao<Link> {
         List<Link> list = query.getResultList();
 
         if (list.size() == 0) {
-            LOGGER.info("Link with this alias was not found :" + alias);
+            LOGGER.warn("Link with alias :{} was not found", alias);
 
             return Optional.empty();
         }

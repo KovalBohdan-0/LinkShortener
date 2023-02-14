@@ -47,8 +47,6 @@ public class LinkService {
             if (foundLinks != null && foundLinks.size() > 0) {
                 links.addAll(user.getLinks());
             }
-
-            LOGGER.info("All user links :" + links + " For user :" + user.getEmail());
         }
 
         return links;
@@ -59,7 +57,7 @@ public class LinkService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         link.setUser(userDao.getByUsername(authentication.getName()));
         linkDao.save(link);
-        LOGGER.info("Saved link :" + link + " to user with username:" + link.getUser().getEmail());
+        LOGGER.info("Saved link :{} to user with username :{}", link, link.getUser().getEmail());
     }
 
     @Transactional

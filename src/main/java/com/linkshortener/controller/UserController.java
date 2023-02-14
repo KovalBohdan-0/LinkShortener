@@ -13,7 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +29,7 @@ import java.util.stream.Collectors;
 public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    private final Logger LOGGER =  LoggerFactory.getLogger(UserController.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     public UserController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
@@ -45,6 +50,7 @@ public class UserController {
             return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
         }
 
+        LOGGER.warn("User with email :{} already exist", userDto.getEmail());
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
@@ -58,7 +64,7 @@ public class UserController {
             return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
         }
 
-
+        LOGGER.warn("User with email :{} already exist", userDto.getEmail());
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 

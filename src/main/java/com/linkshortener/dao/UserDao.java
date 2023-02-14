@@ -33,7 +33,8 @@ public class UserDao implements Dao<User>{
         List<User> list = query.getResultList();
 
         if (list.size() == 0) {
-            LOGGER.info("User with this email was not found :" + username);
+            LOGGER.warn("User with email :{} was not found", username);
+
             return null;
         }
 

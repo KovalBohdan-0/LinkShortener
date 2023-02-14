@@ -33,7 +33,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userDao.getByUsername(username);
-        LOGGER.info("Loaded user with email:" + user.toString() + " and Authorities :" + getAuthorities(user));
+        LOGGER.info("Loaded user with email: {} and Authorities :{}", user.toString(), getAuthorities(user));
 
         return new CustomUserDetails(username, user.getPassword(), new HashSet<>(getAuthorities(user)));
     }
