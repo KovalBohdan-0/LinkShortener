@@ -88,6 +88,17 @@ class LinkServiceTest {
     }
 
     @Test
+    void shouldAddLinkToAnonymousUser() {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("anonymousUser");
+        when(userDao.getByUsername("anonymousUser")).thenReturn(user);
+        linkService.addLink(new Link("link", "alias"));
+
+        verify(userDao).getByUsername("anonymousUser");
+        verify(linkDao).save(any(Link.class));
+    }
+
+    @Test
     void shouldRemoveLink() {
         when(linkDao.get(anyLong())).thenReturn(Optional.of(new Link()));
         linkService.removeLink(1L);
