@@ -8,6 +8,8 @@ import com.linkshortener.service.UserService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
@@ -35,17 +37,29 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public AuthenticationResponse register(@Valid @RequestBody UserDto userDto) {
-        userService.addUser(convertToUser(userDto), UserGroup.USER);
+    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody UserDto userDto) {
+        User user = userService.getUserByEmail(userDto.getEmail());
 
-        return userService.getRegistrationResponse(convertToUser(userDto));
+        if (user == null) {
+            userService.addUser(convertToUser(userDto), UserGroup.USER);
+            return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @PostMapping("/users/admin")
-    public AuthenticationResponse registerAdmin(@Valid @RequestBody UserDto userDto) {
-        userService.addUser(convertToUser(userDto), UserGroup.ADMIN);
+    public ResponseEntity<AuthenticationResponse> registerAdmin(@Valid @RequestBody UserDto userDto) {
+        User user = userService.getUserByEmail(userDto.getEmail());
 
-        return userService.getRegistrationResponse(convertToUser(userDto));
+        if (user == null) {
+            userService.addUser(convertToUser(userDto), UserGroup.ADMIN);
+
+            return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
+        }
+
+
+        return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
     @PostMapping("/login")
