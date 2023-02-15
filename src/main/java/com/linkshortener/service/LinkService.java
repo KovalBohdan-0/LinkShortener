@@ -8,13 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -29,19 +27,33 @@ public class LinkService {
     }
 
     public Optional<Link> getLinkById(long id) {
-        return linkDao.get(id);
+        Optional<Link> optionalLink = linkDao.get(id);
+        Optional<User> optionalUser = getUserFromAuthContext();
+
+        if (isUsersLink(optionalUser, optionalLink)) {
+            return optionalLink;
+        }
+
+        return Optional.empty();
     }
 
     public Optional<Link> getLinkByAlias(String alias) {
-        return linkDao.getLinkByShortLink(alias);
+        Optional<Link> optionalLink = linkDao.getLinkByAlias(alias);
+        Optional<User> optionalUser = getUserFromAuthContext();
+
+        if (isUsersLink(optionalUser, optionalLink)) {
+            return optionalLink;
+        }
+
+        return Optional.empty();
     }
 
     public List<Link> getAllLinks() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> optionalUser = getUserFromAuthContext();
         List<Link> links = new ArrayList<>();
 
-        if (authentication != null) {
-            User user = userDao.getByUsername(authentication.getName());
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
             Set<Link> foundLinks = user.getLinks();
 
             if (foundLinks != null && foundLinks.size() > 0) {
@@ -54,24 +66,56 @@ public class LinkService {
 
     @Transactional
     public void addLink(Link link) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        link.setUser(userDao.getByUsername(authentication.getName()));
-        linkDao.save(link);
-        LOGGER.info("Saved link :{} to user with username :{}", link, link.getUser().getEmail());
+        Optional<User> optionalUser = getUserFromAuthContext();
+
+        if (optionalUser.isPresent()) {
+            link.setUser(optionalUser.get());
+            linkDao.save(link);
+            LOGGER.info("Saved link :{} to user with username :{}", link, link.getUser().getEmail());
+        }
     }
 
     @Transactional
-    public void removeLink(Long id) {
-        linkDao.get(id).ifPresent(linkDao::delete);
+    public void removeLink(long id) {
+        Optional<User> optionalUser = getUserFromAuthContext();
+        Optional<Link> optionalLink = getLinkById(id);
+
+        if (isUsersLink(optionalUser, optionalLink)) {
+            linkDao.get(id).ifPresent(linkDao::delete);
+        }
     }
 
     @Transactional
     public void removeAllLinks() {
+        Optional<User> optionalUser = getUserFromAuthContext();
+
+        if (optionalUser.isPresent()) {
+            linkDao.deleteAllByUserId(optionalUser.get().getId());
+        }
+    }
+
+    private Optional<User> getUserFromAuthContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null) {
-            User user = userDao.getByUsername(authentication.getName());
-            linkDao.deleteAllByUserId(user.getId());
+            if (userDao.getByUsername(authentication.getName()).isPresent()) {
+                return userDao.getByUsername(authentication.getName());
+            }
+
+            LOGGER.error("User with email: {} was not found", authentication.getName());
+            throw new UsernameNotFoundException(String.format("User with email: %s was not found", authentication.getName()));
         }
+
+        return Optional.empty();
+    }
+
+    private boolean isUsersLink(Optional<User> user, Optional<Link> link) {
+        if (link.isPresent()
+                && user.isPresent()
+                && Objects.equals(link.get().getUser().getId(), user.get().getId())) {
+            return true;
+        }
+
+        return false;
     }
 }

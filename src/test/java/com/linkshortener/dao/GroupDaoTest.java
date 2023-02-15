@@ -60,7 +60,7 @@ class GroupDaoTest {
         User user = new User("email", "pass");
         user.setRoles(Set.of(groupDao.getByCode("Manager").orElseThrow()));
         userDao.save(user);
-        long userId = userDao.getByUsername("email").getId();
+        long userId = userDao.getByUsername("email").get().getId();
         Set<Group> foundGroups = groupDao.getGroupsByUserId(userId);
 
         boolean groupIsFound = foundGroups.contains(groupDao.getByCode("Manager").orElseThrow());

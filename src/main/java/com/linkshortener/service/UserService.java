@@ -11,6 +11,7 @@ import com.linkshortener.security.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,12 +42,17 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        return userDao.getByUsername(email);
+        if (userDao.getByUsername(email).isPresent()) {
+            return userDao.getByUsername(email).get();
+        }
+
+        LOGGER.error("User with email: {} was not found", email);
+        throw new UsernameNotFoundException(String.format("User with email: %s was not found", email));
     }
 
     @Transactional
     public boolean addUser(User user, UserGroup userGroup) {
-        if (userDao.getByUsername(user.getEmail()) != null) {
+        if (userDao.getByUsername(user.getEmail()).isPresent()) {
             return false;
         }
 

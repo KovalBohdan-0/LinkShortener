@@ -32,10 +32,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDao.getByUsername(username);
-        LOGGER.info("Loaded user with email: {} and Authorities :{}", user.toString(), getAuthorities(user));
+        if (userDao.getByUsername(username).isPresent()) {
+            User user = userDao.getByUsername(username).get();
+            LOGGER.info("Loaded user with email: {} and Authorities :{}", user.getEmail(), getAuthorities(user));
 
-        return new CustomUserDetails(username, user.getPassword(), new HashSet<>(getAuthorities(user)));
+            return new CustomUserDetails(username, user.getPassword(), new HashSet<>(getAuthorities(user)));
+        }
+
+        LOGGER.error("User with email: {} was not found", username);
+        throw new UsernameNotFoundException(String.format("User with email: %s was not found", username));
     }
 
     private Collection<GrantedAuthority> getAuthorities(User user) {

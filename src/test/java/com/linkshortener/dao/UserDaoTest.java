@@ -35,8 +35,8 @@ class UserDaoTest {
 
     @Test
     void shouldGetUserByUsername() {
-        User user = userDao.getByUsername("first@gmail.com");
-        User notExsitingUser = userDao.getByUsername("first1@gmail.com");
+        User user = userDao.getByUsername("first@gmail.com").orElseThrow();
+        User notExsitingUser = userDao.getByUsername("first1@gmail.com").orElse(null);
 
         assertThat(user).isNotNull();
         assertThat(notExsitingUser).isNull();
@@ -57,19 +57,19 @@ class UserDaoTest {
         User user = new User("test@gmail.com", "pass");
         userDao.save(user);
 
-        User savedUser = userDao.getByUsername("test@gmail.com");
+        User savedUser = userDao.getByUsername("test@gmail.com").orElseThrow();
 
         assertThat(savedUser).isNotNull();
     }
 
     @Test
     void shouldUpdateUser() {
-        User user = userDao.getByUsername("first@gmail.com");
+        User user = userDao.getByUsername("first@gmail.com").orElseThrow();
         user.setEmail("updated@gmail.com");
         userDao.update(user);
 
-        User previousUser = userDao.getByUsername("first@gmail.com");
-        User updatedUser = userDao.getByUsername("updated@gmail.com");
+        User previousUser = userDao.getByUsername("first@gmail.com").orElse(null);
+        User updatedUser = userDao.getByUsername("updated@gmail.com").orElseThrow();
 
         assertThat(updatedUser).isNotNull();
         assertThat(previousUser).isNull();
@@ -77,10 +77,10 @@ class UserDaoTest {
 
     @Test
     void shouldDeleteUser() {
-        User user = userDao.getByUsername("first@gmail.com");
+        User user = userDao.getByUsername("first@gmail.com").orElseThrow();
         userDao.delete(user);
 
-        User deletedUser = userDao.getByUsername("first@gmail.com");
+        User deletedUser = userDao.getByUsername("first@gmail.com").orElse(null);
 
         assertThat(deletedUser).isNull();
     }

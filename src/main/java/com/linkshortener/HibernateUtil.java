@@ -33,14 +33,14 @@ public class HibernateUtil {
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(getDataSource());
-        em.setPackagesToScan("com.linkshortener.entity");
+        LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
+        entityManager.setDataSource(getDataSource());
+        entityManager.setPackagesToScan("com.linkshortener.entity");
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        em.setJpaVendorAdapter(vendorAdapter);
-        em.setJpaProperties(setHibernateProperties());
+        entityManager.setJpaVendorAdapter(vendorAdapter);
+        entityManager.setJpaProperties(setHibernateProperties());
 
-        return em;
+        return entityManager;
     }
 
     @Bean
