@@ -29,7 +29,7 @@ public class LinkDao implements Dao<Link> {
         return Optional.ofNullable(entityManager.find(Link.class, id));
     }
 
-    public Optional<Link> getLinkByShortLink(String alias) {
+    public Optional<Link> getLinkByAlias(String alias) {
         TypedQuery<Link> query = entityManager.createQuery("FROM Link link WHERE link.alias = :alias ", Link.class);
         query.setParameter("alias", alias);
         List<Link> list = query.getResultList();

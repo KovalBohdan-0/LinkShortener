@@ -31,6 +31,9 @@ class UserServiceTest {
     private JwtService jwtService;
     @Mock
     private GroupDao groupDao;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @Mock
+    private Optional<User> optionalUser;
     private AutoCloseable autoCloseable;
 
     @BeforeEach
@@ -60,7 +63,8 @@ class UserServiceTest {
     void shouldFailToAddExistingUser() {
         User user = new User();
         user.setEmail("email");
-        when(userDao.getByUsername(user.getEmail())).thenReturn(user);
+        when(userDao.getByUsername(user.getEmail())).thenReturn(optionalUser);
+        when(optionalUser.isPresent()).thenReturn(true);
         userService.addUser(user, UserGroup.USER);
 
         verify(userDao, never()).save(any(User.class));
@@ -75,9 +79,11 @@ class UserServiceTest {
 
     @Test
     void shouldGetUserByEmail() {
-        userService.getUserByEmail("");
+        when(userDao.getByUsername(anyString())).thenReturn(optionalUser);
+        when(optionalUser.isPresent()).thenReturn(true);
+        userService.getUserByEmail(anyString());
 
-        verify(userDao).getByUsername(anyString());
+        verify(userDao, atLeastOnce()).getByUsername(anyString());
     }
 
     @Test

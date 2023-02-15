@@ -39,7 +39,7 @@ class LinkDaoTest {
 
     @Test
     void shouldGetLinkByShortLink() {
-        Optional<Link> link = linkDao.getLinkByShortLink("service/t.com");
+        Optional<Link> link = linkDao.getLinkByAlias("service/t.com");
 
         boolean isFound = link.isPresent();
 
@@ -61,19 +61,19 @@ class LinkDaoTest {
         Link Link = new Link("https://www.youtube.com", "service/you.com");
         linkDao.save(Link);
 
-        boolean savedLinkIsFound = linkDao.getLinkByShortLink("service/you.com").isPresent();
+        boolean savedLinkIsFound = linkDao.getLinkByAlias("service/you.com").isPresent();
 
         assertThat(savedLinkIsFound).isTrue();
     }
 
     @Test
     void shouldUpdateLink() {
-        Optional<Link> link = linkDao.getLinkByShortLink("service/t.com");
+        Optional<Link> link = linkDao.getLinkByAlias("service/t.com");
         link.get().setAlias("updatedLink");
         linkDao.update(link.get());
 
-        boolean updatedLinkIsFound = linkDao.getLinkByShortLink("updatedLink").isPresent();
-        boolean previousLinkIsFound = linkDao.getLinkByShortLink("service/t.com").isPresent();
+        boolean updatedLinkIsFound = linkDao.getLinkByAlias("updatedLink").isPresent();
+        boolean previousLinkIsFound = linkDao.getLinkByAlias("service/t.com").isPresent();
 
         assertThat(updatedLinkIsFound).isTrue();
         assertThat(previousLinkIsFound).isFalse();
@@ -81,10 +81,10 @@ class LinkDaoTest {
 
     @Test
     void shouldDeleteLink() {
-        Optional<Link> link = linkDao.getLinkByShortLink("service/t.com");
+        Optional<Link> link = linkDao.getLinkByAlias("service/t.com");
         linkDao.delete(link.get());
 
-        boolean deletedLinkIsFound = linkDao.getLinkByShortLink("service/t.com").isPresent();
+        boolean deletedLinkIsFound = linkDao.getLinkByAlias("service/t.com").isPresent();
 
         assertThat(deletedLinkIsFound).isFalse();
     }

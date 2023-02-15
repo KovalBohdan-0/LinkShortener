@@ -27,7 +27,7 @@ public class UserDao implements Dao<User>{
         return Optional.ofNullable(entityManager.find(User.class, id));
     }
 
-    public User getByUsername(String username) {
+    public Optional<User> getByUsername(String username) {
         TypedQuery<User> query = entityManager.createQuery("FROM users user WHERE user.email = :email ", User.class);
         query.setParameter("email", username);
         List<User> list = query.getResultList();
@@ -35,10 +35,10 @@ public class UserDao implements Dao<User>{
         if (list.size() == 0) {
             LOGGER.warn("User with email :{} was not found", username);
 
-            return null;
+            return Optional.empty();
         }
 
-        return list.get(0);
+        return Optional.of(list.get(0));
     }
 
     @Override
