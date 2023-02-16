@@ -30,6 +30,7 @@ class LinkControllerTest {
     @Test
     void shouldRedirectToUrl() throws Exception {
         when(linkService.getLinkByAlias(anyString())).thenReturn(Optional.of(new Link("fullLink", "alias")));
+
         this.mockMvc.perform(get("/{alias}", "alias")).andExpect(status().isFound());
 
         verify(linkService).getLinkByAlias(anyString());
@@ -38,6 +39,7 @@ class LinkControllerTest {
     @Test
     void shouldNotRedirectToNotFoundedUrl() throws Exception {
         when(linkService.getLinkByAlias(anyString())).thenReturn(Optional.empty());
+
         this.mockMvc.perform(get("/{alias}", "alias")).andExpect(status().isNotFound());
 
         verify(linkService).getLinkByAlias(anyString());
@@ -100,6 +102,7 @@ class LinkControllerTest {
     @WithMockUser
     void shouldNotRemoveLinkWhenNotFound() throws Exception {
         when(linkService.getLinkById(anyLong())).thenReturn(Optional.empty());
+
         this.mockMvc.perform(delete("/api/links/{id}", 1L)).andExpect(status().isNotFound());
 
         verify(linkService, never()).removeLink(anyLong());
