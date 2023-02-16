@@ -65,6 +65,7 @@ class UserServiceTest {
         user.setEmail("email");
         when(userDao.getByUsername(user.getEmail())).thenReturn(optionalUser);
         when(optionalUser.isPresent()).thenReturn(true);
+
         userService.addUser(user, UserGroup.USER);
 
         verify(userDao, never()).save(any(User.class));
@@ -81,6 +82,7 @@ class UserServiceTest {
     void shouldGetUserByEmail() {
         when(userDao.getByUsername(anyString())).thenReturn(optionalUser);
         when(optionalUser.isPresent()).thenReturn(true);
+
         userService.getUserByEmail(anyString());
 
         verify(userDao, atLeastOnce()).getByUsername(anyString());
@@ -90,6 +92,7 @@ class UserServiceTest {
     @SuppressWarnings("unchecked")
     void shouldGetRegistrationResponse() {
         User user = new User();
+
         userService.getRegistrationResponse(user);
 
         verify(jwtService).generateJwt(any(Map.class), any(UserDetails.class));
@@ -99,6 +102,7 @@ class UserServiceTest {
     void shouldRemoveUserById() {
         User user = new User();
         when(userDao.get(1L)).thenReturn(Optional.of(user));
+
         userService.removeUser(1L);
 
         verify(userDao).get(anyLong());
@@ -108,6 +112,7 @@ class UserServiceTest {
     @Test
     void shouldFailToRemoveNotExistingUser() {
         when(userDao.get(1L)).thenReturn(Optional.empty());
+
         userService.removeUser(1L);
 
         verify(userDao).get(anyLong());

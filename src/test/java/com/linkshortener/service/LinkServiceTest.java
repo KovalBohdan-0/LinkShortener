@@ -36,8 +36,6 @@ class LinkServiceTest {
     private Optional<User> optionalUser;
     @Mock
     private Link link;
-    @Mock
-    private LinkService linkServiceMock;
 
     private AutoCloseable autoCloseable;
 
@@ -87,6 +85,7 @@ class LinkServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
         when(optionalUser.get()).thenReturn(user);
+
         linkService.getAllLinks();
 
         verify(user).getLinks();
@@ -95,6 +94,7 @@ class LinkServiceTest {
     @Test
     void shouldNotGetAllLinksWhenNotAuthenticated() {
         when(securityContext.getAuthentication()).thenReturn(null);
+
         linkService.getAllLinks();
 
         verify(user, never()).getLinks();
@@ -105,6 +105,7 @@ class LinkServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
         when(link.getUser()).thenReturn(user);
+
         linkService.addLink(link);
 
         verify(linkDao).save(any(Link.class));
@@ -117,6 +118,7 @@ class LinkServiceTest {
         when(userDao.getByUsername(any())).thenReturn(Optional.of(user));
         when(link.getUser()).thenReturn(user);
         when(linkDao.get(anyLong())).thenReturn(Optional.of(link));
+
         linkService.removeLink(0L);
 
         verify(linkDao).delete(any(Link.class));
@@ -127,6 +129,7 @@ class LinkServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
         when(optionalUser.get()).thenReturn(user);
+
         linkService.removeAllLinks();
 
         verify(linkDao).deleteAllByUserId(anyLong());
@@ -135,6 +138,7 @@ class LinkServiceTest {
     @Test
     void shouldNotRemoveAllLinksWhenNotAuthenticated() {
         when(securityContext.getAuthentication()).thenReturn(null);
+
         linkService.removeAllLinks();
 
         verify(linkDao, never()).deleteAll();
