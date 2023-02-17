@@ -71,7 +71,7 @@ public class LinkDao implements Dao<Link> {
     }
 
     public void deleteAllByUserId(long id) {
-        Query query = entityManager.createQuery("DELETE FROM Link WHERE Link.user.id = :userId").setParameter("userId", id);
+        Query query = entityManager.createQuery("DELETE FROM Link link WHERE link.user.id = :userId").setParameter("userId", id);
         query.executeUpdate();
     }
 }

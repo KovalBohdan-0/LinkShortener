@@ -21,6 +21,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This class consist of methods that make business logic of creation,
+ * retrieving, removing of users
+ *
+ * @author Bohdan Koval
+ * @see UserDao
+ * @see GroupDao
+ * @see UserGroup
+ * @see User
+ * @see JwtService
+ */
 @Service
 @Transactional(readOnly = true)
 public class UserService {
@@ -37,10 +48,21 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Return all users to user with ADMIN authorities
+     *
+     * @return all users
+     */
     public List<User> getAllUsers() {
         return userDao.getAll();
     }
 
+    /**
+     * Returns user by email throws UsernameNotFoundException if not found
+     *
+     * @param email user email
+     * @return found user, if not found throws exception
+     */
     public User getUserByEmail(String email) {
         if (userDao.getByUsername(email).isPresent()) {
             return userDao.getByUsername(email).get();
@@ -50,33 +72,47 @@ public class UserService {
         throw new UsernameNotFoundException(String.format("User with email: %s was not found", email));
     }
 
+    /**
+     * Adds new user if the username was not already used.
+     *
+     * @param user      the user to add
+     * @param userGroup authorities that user will have USER or ADMIN
+     */
     @Transactional
-    public boolean addUser(User user, UserGroup userGroup) {
-        if (userDao.getByUsername(user.getEmail()).isPresent()) {
-            return false;
+    public void addUser(User user, UserGroup userGroup) {
+        if (userDao.getByUsername(user.getEmail()).isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            addGroupToUser(user, userGroup);
+            userDao.save(user);
         }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        addGroupToUser(user, userGroup);
-        userDao.save(user);
-
-        return true;
     }
 
-    public void addGroupToUser(User user, UserGroup group) {
+    /**
+     * Adds group to user that will grant him authorities
+     *
+     * @param user      the user that will get a new group
+     * @param userGroup authorities that user will have USER or ADMIN
+     */
+    public void addGroupToUser(User user, UserGroup userGroup) {
         Set<Group> groups = new HashSet<>();
 
         if (user.getRoles() != null) {
             groups.addAll(user.getRoles());
         }
 
-        String role = group.toString();
+        String role = userGroup.toString();
 
         LOGGER.info("Adding user with groups :{} and Role :{}", groups, groupDao.getByCode(role).orElse(new Group("Not found", "")));
         groupDao.getByCode(role).ifPresent(groups::add);
         user.setRoles(groups);
     }
 
+    /**
+     * Return registration response with jwt token that will be used to authorization
+     *
+     * @param user logged or registered user
+     * @return jwt token to make authorized requests
+     */
     public AuthenticationResponse getRegistrationResponse(User user) {
         UserDetails userDetails = new CustomUserDetails(user.getEmail(), user.getPassword());
         String jwt = jwtService.generateJwt(new HashMap<>(), userDetails);
@@ -84,11 +120,19 @@ public class UserService {
         return new AuthenticationResponse(jwt);
     }
 
+    /**
+     * Removes all users to user with ADMIN authorities
+     */
     @Transactional
     public void removeAllUsers() {
         userDao.deleteAll();
     }
 
+    /**
+     * Removes user by id if not found no exception
+     *
+     * @param id the id of user
+     */
     @Transactional
     public void removeUser(Long id) {
         userDao.get(id).ifPresent(userDao::delete);

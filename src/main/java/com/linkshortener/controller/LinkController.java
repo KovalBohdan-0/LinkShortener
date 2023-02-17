@@ -21,6 +21,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * This class consist of secured api endpoints that create short links of some
+ * urls. Also gives abilities to add link to user, get and delete it.
+ *
+ * @author Bohdan Koval
+ * @see LinkService
+ * @see Link
+ * @see LinkDto
+ */
 @Validated
 @RestController
 public class LinkController {
@@ -31,6 +40,15 @@ public class LinkController {
         this.linkService = linkService;
     }
 
+    /**
+     * If alias was found in database will redirect to full link of current user.
+     * If user not authenticated will try to find alias in anonymousUser.
+     *
+     * @param alias the alias of redirect link
+     * @return redirect to saved link by alias, HTTP status code
+     * 302 - successfully redirected,
+     * 404 - alias was not found
+     */
     @GetMapping("/{alias}")
     public ResponseEntity<HttpHeaders> redirectToUrl(@PathVariable String alias) {
         Optional<Link> link = linkService.getLinkByAlias(alias);
@@ -52,11 +70,35 @@ public class LinkController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Return current user links. Nothing will return if user not authenticated.
+     *
+     * @return all current user links, HTTP status code
+     * 200 - returned all found links
+     * 404 - user not found
+     */
     @GetMapping("/api/links")
     public List<LinkDto> getLinks() {
         return linkService.getAllLinks().stream().map(this::convertToLinkDto).collect(Collectors.toList());
     }
 
+    /**
+     * Adds link to current user. If user not authenticated will add link to anonymousUser.
+     * Fails if alias is already used.
+     * Usage:
+     * <pre>
+     * {
+     *   "fullLink": "www.youtube.com",
+     *   "alias": "youtube"
+     * }
+     * </pre>
+     *
+     * @param linkDto link to add
+     * @return HTTP status code
+     * 200 - link added,
+     * 400 - not valid link,
+     * 409 - alias already exist
+     */
     @PostMapping("/api/links")
     public ResponseEntity<Void> addLink(@Valid @RequestBody LinkDto linkDto) {
         Link link = convertToLink(linkDto);
@@ -71,6 +113,14 @@ public class LinkController {
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
+    /**
+     * Removes current user link by id, will not remove link of other user.
+     *
+     * @param id the id of link to delete
+     * @return HTTP status code
+     * 200 - removed link,
+     * 404 - link with this id was not found(for this user)
+     */
     @DeleteMapping("/api/links/{id}")
     public ResponseEntity<Void> removeLink(@PathVariable Long id) {
         Optional<Link> link = linkService.getLinkById(id);
@@ -85,6 +135,12 @@ public class LinkController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Removes all links from current user. Not removes links from anonymousUser.
+     * Returns HTTP status code
+     * 200 - removed all user link,
+     * 404 - not found user
+     */
     @DeleteMapping("/api/links")
     public void removeLinks() {
         linkService.removeAllLinks();
