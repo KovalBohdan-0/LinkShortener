@@ -12,6 +12,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Class that allows to control database user entities.
+ *
+ * @author Bohdan Koval
+ * @see com.linkshortener.dao.Dao
+ * @see User
+ */
 @Repository
 public class UserDao implements Dao<User>{
     @PersistenceContext
@@ -27,6 +34,12 @@ public class UserDao implements Dao<User>{
         return Optional.ofNullable(entityManager.find(User.class, id));
     }
 
+    /**
+     * Returns group by username, if nothing found, returns empty Optional
+     *
+     * @param username the code of user
+     * @return the found user
+     */
     public Optional<User> getByUsername(String username) {
         TypedQuery<User> query = entityManager.createQuery("FROM users user WHERE user.email = :email ", User.class);
         query.setParameter("email", username);
