@@ -17,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
 class UserServiceTest {
@@ -52,11 +51,10 @@ class UserServiceTest {
         User user = new User();
         user.setPassword("pass");
 
-        boolean isUserCreated = userService.addUser(user, UserGroup.USER);
+        userService.addUser(user, UserGroup.USER);
 
         verify(userDao).save(any(User.class));
         verify(passwordEncoder).encode(anyString());
-        assertThat(isUserCreated).isTrue();
     }
 
     @Test
