@@ -14,6 +14,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Class that allows to control database group entities.
+ *
+ * @author Bohdan Koval
+ * @see com.linkshortener.dao.Dao
+ * @see Group
+ */
 @Repository
 public class GroupDao implements Dao<Group> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupDao.class);
@@ -29,6 +36,12 @@ public class GroupDao implements Dao<Group> {
         return Optional.ofNullable(entityManager.find(Group.class, id));
     }
 
+    /**
+     * Returns group by code, if nothing found, returns empty Optional
+     *
+     * @param code the code of group
+     * @return the found group
+     */
     public Optional<Group> getByCode(String code) {
         TypedQuery<Group> query = entityManager.createQuery("FROM roles role WHERE role.code = :code ", Group.class);
         query.setParameter("code", code);
@@ -49,6 +62,12 @@ public class GroupDao implements Dao<Group> {
                 .getResultList();
     }
 
+    /**
+     * Returns groups by users' id, if nothing found, returns empty Set
+     *
+     * @param id the id of user
+     * @return set of users group
+     */
     @SuppressWarnings("unchecked")
     public Set<Group> getGroupsByUserId(long id) {
         Query query = entityManager.createQuery("SELECT role FROM roles role JOIN FETCH role.users user WHERE user.id =: user_id", Group.class).setParameter("user_id", id);

@@ -12,6 +12,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Class that allows to control database link entities.
+ *
+ * @author Bohdan Koval
+ * @see com.linkshortener.dao.Dao
+ * @see Link
+ */
+
 @Repository
 public class LinkDao implements Dao<Link> {
 
@@ -29,6 +37,12 @@ public class LinkDao implements Dao<Link> {
         return Optional.ofNullable(entityManager.find(Link.class, id));
     }
 
+    /**
+     * Returns link by alias, if nothing found, returns empty Optional
+     *
+     * @param alias the code of link
+     * @return the found link
+     */
     public Optional<Link> getLinkByAlias(String alias) {
         TypedQuery<Link> query = entityManager.createQuery("FROM Link link WHERE link.alias = :alias ", Link.class);
         query.setParameter("alias", alias);
@@ -45,13 +59,13 @@ public class LinkDao implements Dao<Link> {
 
     @Override
     public List<Link> getAll() {
-        return entityManager.createQuery( "FROM Link", Link.class )
+        return entityManager.createQuery("FROM Link", Link.class)
                 .getResultList();
     }
 
     @Override
     public void save(Link link) {
-        entityManager.persist(link) ;
+        entityManager.persist(link);
     }
 
     @Override
@@ -70,6 +84,11 @@ public class LinkDao implements Dao<Link> {
         query.executeUpdate();
     }
 
+    /**
+     * Delete all links by user id
+     *
+     * @param id the id of user
+     */
     public void deleteAllByUserId(long id) {
         Query query = entityManager.createQuery("DELETE FROM Link link WHERE link.user.id = :userId").setParameter("userId", id);
         query.executeUpdate();
