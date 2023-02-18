@@ -5,6 +5,11 @@ import com.linkshortener.entity.User;
 import com.linkshortener.enums.UserGroup;
 import com.linkshortener.security.AuthenticationResponse;
 import com.linkshortener.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,34 +55,26 @@ public class UserController {
         this.authenticationManager = authenticationManager;
     }
 
-    /**
-     * If user has ADMIN authorities than it wil return all users. If user not
-     * authenticated than the result will be empty array.
-     *
-     * @return list of all users, HTTP status code
-     * 403 - forbidden for user without ADMIN authority
-     */
+    @Operation(summary = "If user has ADMIN authorities than it wil return all users. If user not authenticated than the result will be empty array.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "users returned",
+                    content = {@Content(mediaType = "application/json",
+                            schema =  @Schema(implementation = UserDto.class))}),
+            @ApiResponse(responseCode = "403", description = "forbidden for user without ADMIN authority")
+    })
     @GetMapping("/users")
     public List<UserDto> getUsers() {
         return userService.getAllUsers().stream().map(this::convertToUserDto).collect(Collectors.toList());
     }
 
-    /**
-     * Creates user with USER authorities, fails if email is already used.
-     * Usage:
-     * <pre>
-     * {
-     *   "email": "user@gmail.com",
-     *   "password": "password"
-     * }
-     * </pre>
-     *
-     * @param userDto user to add
-     * @return HTTP status code
-     * 200 - user added,
-     * 400 - not valid user,
-     * 409 - email already exist
-     */
+    @Operation(summary = "Creates user with USER authorities, fails if email is already used.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "user added",
+                    content = {@Content(mediaType = "application/json",
+                            schema =  @Schema(implementation = AuthenticationResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "not valid user"),
+            @ApiResponse(responseCode = "409", description = "email already exist")
+    })
     @PostMapping("/users")
     public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody UserDto userDto) {
         Optional<User> user = userService.getUserByEmail(userDto.getEmail());
@@ -91,24 +88,15 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
-    /**
-     * Creates user with ADMIN authorities, fails if email is already used
-     * and user doesn't have ADMIN authorities.
-     * Usage:
-     * <pre>
-     * {
-     *   "email": "admin@gmail.com",
-     *   "password": "password"
-     * }
-     * </pre>
-     *
-     * @param userDto user to add
-     * @return HTTP status code
-     * 200 - user added,
-     * 400 - not valid user,
-     * 403 - forbidden for user without ADMIN authority
-     * 409 - email already exist
-     */
+    @Operation(summary = "Creates user with ADMIN authorities, fails if email is already used and user doesn't have ADMIN authorities.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "user added",
+                    content = {@Content(mediaType = "application/json",
+                            schema =  @Schema(implementation = AuthenticationResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "not valid user"),
+            @ApiResponse(responseCode = "403", description = "forbidden for user without ADMIN authority"),
+            @ApiResponse(responseCode = "409", description = "email already exist")
+    })
     @PostMapping("/users/admin")
     public ResponseEntity<AuthenticationResponse> registerAdmin(@Valid @RequestBody UserDto userDto) {
         Optional<User> user = userService.getUserByEmail(userDto.getEmail());
@@ -123,15 +111,14 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
-    /**
-     * Logins and returns jwt token for authorization
-     *
-     * @param userDto user to add
-     * @return jwt token as success, HTTP status code
-     * 200 - login was successful
-     * 400 - not valid user
-     * 404 - user or password incorrect
-     */
+    @Operation(summary = "Logins and returns jwt token for authorization")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "login was successful",
+                    content = {@Content(mediaType = "application/json",
+                            schema =  @Schema(implementation = AuthenticationResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "not valid user"),
+            @ApiResponse(responseCode = "404", description = "user or password incorrect")
+    })
     @PostMapping("/login")
     public AuthenticationResponse login(@Valid @RequestBody UserDto userDto) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
@@ -144,11 +131,11 @@ public class UserController {
         throw new UsernameNotFoundException("User not found, email :" + userDto.getEmail());
     }
 
-    /**
-     * Delete all users if signed as admin
-     * Returns HTTP status code
-     * 403 - forbidden for user without ADMIN authority
-     */
+    @Operation(summary = "Delete all users if signed as admin")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "removed all users"),
+            @ApiResponse(responseCode = "403", description = "forbidden for user without ADMIN authority")
+    })
     @DeleteMapping("/users")
     public void deleteUsers() {
         userService.removeAllUsers();
