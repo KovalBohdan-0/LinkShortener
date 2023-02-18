@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -78,9 +80,9 @@ public class UserController {
      */
     @PostMapping("/users")
     public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody UserDto userDto) {
-        User user = userService.getUserByEmail(userDto.getEmail());
+        Optional<User> user = userService.getUserByEmail(userDto.getEmail());
 
-        if (user == null) {
+        if (user.isEmpty()) {
             userService.addUser(convertToUser(userDto), UserGroup.USER);
             return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
         }
@@ -109,9 +111,9 @@ public class UserController {
      */
     @PostMapping("/users/admin")
     public ResponseEntity<AuthenticationResponse> registerAdmin(@Valid @RequestBody UserDto userDto) {
-        User user = userService.getUserByEmail(userDto.getEmail());
+        Optional<User> user = userService.getUserByEmail(userDto.getEmail());
 
-        if (user == null) {
+        if (user.isEmpty()) {
             userService.addUser(convertToUser(userDto), UserGroup.ADMIN);
 
             return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
@@ -123,6 +125,7 @@ public class UserController {
 
     /**
      * Logins and returns jwt token for authorization
+     *
      * @param userDto user to add
      * @return jwt token as success, HTTP status code
      * 200 - login was successful
@@ -132,9 +135,13 @@ public class UserController {
     @PostMapping("/login")
     public AuthenticationResponse login(@Valid @RequestBody UserDto userDto) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
-        User foundedUser = userService.getUserByEmail(userDto.getEmail());
+        Optional<User> foundedUser = userService.getUserByEmail(userDto.getEmail());
 
-        return userService.getRegistrationResponse(foundedUser);
+        if (foundedUser.isPresent()) {
+            return userService.getRegistrationResponse(foundedUser.get());
+        }
+
+        throw new UsernameNotFoundException("User not found, email :" + userDto.getEmail());
     }
 
     /**
