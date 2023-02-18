@@ -129,6 +129,7 @@ class LinkServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
         when(optionalUser.get()).thenReturn(user);
+        when(user.getEmail()).thenReturn("email");
 
         linkService.removeAllLinks();
 

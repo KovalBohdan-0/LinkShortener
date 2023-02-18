@@ -78,8 +78,7 @@ class UserServiceTest {
 
     @Test
     void shouldGetUserByEmail() {
-        when(userDao.getByUsername(anyString())).thenReturn(optionalUser);
-        when(optionalUser.isPresent()).thenReturn(true);
+        when(userDao.getByUsername(anyString())).thenReturn(Optional.of(new User()));
 
         userService.getUserByEmail(anyString());
 

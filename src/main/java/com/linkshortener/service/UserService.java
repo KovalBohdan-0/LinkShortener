@@ -11,15 +11,11 @@ import com.linkshortener.security.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class consist of methods that make business logic of creation,
@@ -58,18 +54,19 @@ public class UserService {
     }
 
     /**
-     * Returns user by email throws UsernameNotFoundException if not found
+     * Returns user by email, if not found returns empty optional.
      *
      * @param email user email
-     * @return found user, if not found throws exception
+     * @return found user, empty optional
      */
-    public User getUserByEmail(String email) {
+    public Optional<User> getUserByEmail(String email) {
         if (userDao.getByUsername(email).isPresent()) {
-            return userDao.getByUsername(email).get();
+            return Optional.of(userDao.getByUsername(email).get());
         }
 
-        LOGGER.error("User with email: {} was not found", email);
-        throw new UsernameNotFoundException(String.format("User with email: %s was not found", email));
+        LOGGER.warn("User with email: {} was not found", email);
+
+        return Optional.empty();
     }
 
     /**

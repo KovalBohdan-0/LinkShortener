@@ -12,6 +12,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -56,7 +58,7 @@ class UserControllerTest {
 
     @Test
     void shouldNotRegisterUserWithExistingEmail() throws Exception {
-        when(userService.getUserByEmail(anyString())).thenReturn(new User());
+        when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(new User()));
 
         this.mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -90,7 +92,7 @@ class UserControllerTest {
     @Test
     @WithMockUser(username="admin", authorities = {"ADMIN"})
     void shouldNotRegisterAdminWithExistingEmail() throws Exception {
-        when(userService.getUserByEmail(anyString())).thenReturn(new User());
+        when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(new User()));
 
         this.mockMvc.perform(post("/api/users/admin")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -141,6 +143,8 @@ class UserControllerTest {
 
     @Test
     void shouldLogin() throws Exception {
+        when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(new User()));
+
         this.mockMvc.perform(post("/api/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\": \"user@gmail.com\", \"password\":  \"pass\"}"))
