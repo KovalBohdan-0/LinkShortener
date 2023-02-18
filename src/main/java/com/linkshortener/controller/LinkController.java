@@ -3,6 +3,11 @@ package com.linkshortener.controller;
 import com.linkshortener.dto.LinkDto;
 import com.linkshortener.entity.Link;
 import com.linkshortener.service.LinkService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,15 +45,14 @@ public class LinkController {
         this.linkService = linkService;
     }
 
-    /**
-     * If alias was found in database will redirect to full link of current user.
-     * If user not authenticated will try to find alias in anonymousUser.
-     *
-     * @param alias the alias of redirect link
-     * @return redirect to saved link by alias, HTTP status code
-     * 302 - successfully redirected,
-     * 404 - alias was not found
-     */
+    @Operation(summary = "If alias was found in database will redirect to full link of current user." +
+            " If user not authenticated will try to find alias in anonymousUser.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "302", description = "successfully redirected",
+                    content = {@Content(mediaType = "application/json",
+                            schema =  @Schema(implementation = HttpHeaders.class))}),
+            @ApiResponse(responseCode = "404", description = "alias was not found")
+    })
     @GetMapping("/{alias}")
     public ResponseEntity<HttpHeaders> redirectToUrl(@PathVariable String alias) {
         Optional<Link> link = linkService.getLinkByAlias(alias);
@@ -70,35 +74,24 @@ public class LinkController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    /**
-     * Return current user links. Nothing will return if user not authenticated.
-     *
-     * @return all current user links, HTTP status code
-     * 200 - returned all found links
-     * 404 - user not found
-     */
+    @Operation(summary = "Return current user links. Nothing will return if user not authenticated.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "returned all found links",
+                    content = {@Content(mediaType = "application/json",
+                            schema =  @Schema(implementation = LinkDto.class))}),
+            @ApiResponse(responseCode = "403", description = "user not found")
+    })
     @GetMapping("/api/links")
     public List<LinkDto> getLinks() {
         return linkService.getAllLinks().stream().map(this::convertToLinkDto).collect(Collectors.toList());
     }
 
-    /**
-     * Adds link to current user. If user not authenticated will add link to anonymousUser.
-     * Fails if alias is already used.
-     * Usage:
-     * <pre>
-     * {
-     *   "fullLink": "www.youtube.com",
-     *   "alias": "youtube"
-     * }
-     * </pre>
-     *
-     * @param linkDto link to add
-     * @return HTTP status code
-     * 200 - link added,
-     * 400 - not valid link,
-     * 409 - alias already exist
-     */
+    @Operation(summary = "Adds link to current user. If user not authenticated will add link to anonymousUser. Fails if alias is already used.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "link added"),
+            @ApiResponse(responseCode = "400", description = "not valid link"),
+            @ApiResponse(responseCode = "409", description = "alias already exist")
+    })
     @PostMapping("/api/links")
     public ResponseEntity<Void> addLink(@Valid @RequestBody LinkDto linkDto) {
         Link link = convertToLink(linkDto);
@@ -113,14 +106,11 @@ public class LinkController {
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
-    /**
-     * Removes current user link by id, will not remove link of other user.
-     *
-     * @param id the id of link to delete
-     * @return HTTP status code
-     * 200 - removed link,
-     * 404 - link with this id was not found(for this user)
-     */
+    @Operation(summary = "Removes link from current user. Not removes links from anonymousUser.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "removed link from user"),
+            @ApiResponse(responseCode = "404", description = "link with this id was not found(for this user)")
+    })
     @DeleteMapping("/api/links/{id}")
     public ResponseEntity<Void> removeLink(@PathVariable Long id) {
         Optional<Link> link = linkService.getLinkById(id);
@@ -135,12 +125,11 @@ public class LinkController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    /**
-     * Removes all links from current user. Not removes links from anonymousUser.
-     * Returns HTTP status code
-     * 200 - removed all user link,
-     * 404 - not found user
-     */
+    @Operation(summary = "Removes all links from current user. Not removes links from anonymousUser.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "removed all user links"),
+            @ApiResponse(responseCode = "404", description = "not found user")
+    })
     @DeleteMapping("/api/links")
     public void removeLinks() {
         linkService.removeAllLinks();
