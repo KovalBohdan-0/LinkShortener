@@ -8,7 +8,7 @@ import java.util.Set;
 @Entity(name = "users")
 public class User {
     @Basic
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
     @Basic
     @Column(name = "password")

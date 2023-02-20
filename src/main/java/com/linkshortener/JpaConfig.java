@@ -15,9 +15,9 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-public class HibernateUtil {
+public class JpaConfig {
 
-    public HibernateUtil() {
+    public JpaConfig() {
 
     }
 
@@ -25,7 +25,7 @@ public class HibernateUtil {
     public static DataSource getDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/link_shortener");
+        dataSource.setUrl(System.getenv("DATASOURCE_URL"));
         dataSource.setUsername("postgres");
         dataSource.setPassword(System.getenv("PGPASSWORD"));
         return dataSource;

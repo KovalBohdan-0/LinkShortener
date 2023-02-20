@@ -15,7 +15,7 @@ public class Link {
     @Column(name = "full_link")
     private String fullLink;
     @Basic
-    @Column(name = "alias")
+    @Column(name = "alias", unique = true)
     private String alias;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
