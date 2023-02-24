@@ -1,0 +1,17 @@
+.shortener {
+    background-color: rgb(17, 93, 236) !important;
+}
+
+.shortener input {
+    color: black;
+    font-weight: 500;
+}
+
+.shortener button {
+    font-weight: 900;
+}
+
+.shortener p {
+    color: white;
+    font-weight: 700;
+}
