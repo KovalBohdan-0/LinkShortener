@@ -1,4 +1,4 @@
-package com.linkshortener;
+package com.linkshortener.config;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.context.annotation.Bean;
