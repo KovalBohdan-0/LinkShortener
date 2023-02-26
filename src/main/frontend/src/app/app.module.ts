@@ -9,12 +9,16 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { LinkService } from './link.service';
+import { SignupComponent } from './signup/signup.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ShortenerComponent,
-    NavbarComponent
+    NavbarComponent,
+    SignupComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

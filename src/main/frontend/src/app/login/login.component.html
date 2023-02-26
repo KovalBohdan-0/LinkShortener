@@ -1,0 +1,10 @@
+<div class="login mx-auto my-auto p-3 bg-white w-50 rounded ">
+    <form #formLink="ngForm" method="post" (ngSubmit)="logIn(formLink)" class="container d-flex flex-column w-100 gap-4">
+        <p class="form-headline">Login to URL Shortener</p>
+        <input type="text" name="email-input" placeholder="Email" class="input form-control-lg border" required ngModel>
+        <input type="text" name="password-input" placeholder="Password" class="input form-control-lg border" ngModel>
+        <button type="submit" class="button btn btn-primary btn-lg w-30">Log in</button>
+        <p class="form-headline mx-auto fs-4">Or</p>
+        <button type="button" class="button btn btn-primary btn-lg w-30">Sign up</button>
+    </form>
+</div>

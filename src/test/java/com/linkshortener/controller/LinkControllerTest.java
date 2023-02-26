@@ -28,19 +28,19 @@ class LinkControllerTest {
     private LinkService linkService;
 
     @Test
-    void shouldRedirectToUrl() throws Exception {
+    void shouldGetLinkByAlias() throws Exception {
         when(linkService.getLinkByAlias(anyString())).thenReturn(Optional.of(new Link("fullLink", "alias")));
 
-        this.mockMvc.perform(get("/{alias}", "alias")).andExpect(status().isFound());
+        this.mockMvc.perform(get("/api/links/{alias}", "alias")).andExpect(status().isOk());
 
         verify(linkService).getLinkByAlias(anyString());
     }
 
     @Test
-    void shouldNotRedirectToNotFoundedUrl() throws Exception {
+    void shouldNotGetLinkByNotFoundAlias() throws Exception {
         when(linkService.getLinkByAlias(anyString())).thenReturn(Optional.empty());
 
-        this.mockMvc.perform(get("/{alias}", "alias")).andExpect(status().isNotFound());
+        this.mockMvc.perform(get("/api/links/{alias}", "alias")).andExpect(status().isNotFound());
 
         verify(linkService).getLinkByAlias(anyString());
     }

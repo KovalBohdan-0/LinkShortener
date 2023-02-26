@@ -1,10 +1,9 @@
 <div class="shortener mx-auto my-auto p-3 bg-white w-50 rounded ">
     <form #formLink="ngForm" method="post" (ngSubmit)="shortLink(formLink)" class="container d-flex flex-column w-100 gap-4">
-        <p>Free URL Shortener</p>
-        <input type="text" name="link-input" placeholder="Enter URL to short" class="form-control-lg border" required ngModel>
-        <input type="text" name="alias-input" placeholder="Alias" class="form-control-lg border" ngModel>
-        <button type="submit" class="btn btn-primary btn-lg w-30">Short URL</button>
-
+        <p class="form-headline">Free URL Shortener</p>
+        <input type="text" name="link-input" placeholder="Enter URL to short" class="input form-control-lg border" required ngModel>
+        <input type="text" name="alias-input" placeholder="Alias" class="input form-control-lg border" ngModel>
+        <button type="submit" class="button btn btn-primary btn-lg w-30">Short URL</button>
     </form>
 
 </div>
