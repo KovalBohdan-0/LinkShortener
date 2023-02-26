@@ -1,17 +1,7 @@
-<div>
-    <ul ngbNav #nav="ngbNav" class="nav-tabs">
-        <li ngbNavItem>
-            <a ngbNavLink>Your urls</a>
-            <ng-template ngbNavContent>Urls</ng-template>
-        </li>
-        <li ngbNavItem>
-            <a ngbNavLink>Login</a>
-            <ng-template ngbNavContent>First content</ng-template>
-        </li>
-        <li ngbNavItem>
-            <a ngbNavLink>Sign up</a>
-            <ng-template ngbNavContent>Second content</ng-template>
-        </li>
+<nav class="navbar">
+    <ul>
+        <li><a class="nav-link" routerLink="/app-shortener" routerLinkActive="active" ariaCurrentWhenActive="page">Home</a></li>
+        <li><a class="nav-link" routerLink="/app-login" routerLinkActive="active" ariaCurrentWhenActive="page">Log in</a></li>
+        <li><a class="nav-link" routerLink="/app-signup" routerLinkActive="active" ariaCurrentWhenActive="page">Sign up</a></li>
     </ul>
-    <div [ngbNavOutlet]="nav"></div>
-</div>
+</nav>

@@ -1,0 +1,33 @@
+.navbar {
+    width: 70%;
+    margin: 1rem 4rem 4rem 6rem;
+}
+
+.nav-link {
+    padding: 0.7rem;
+    background-color: white;
+    width: fit-content;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    background-color: rgb(26, 68, 160);
+    color: white;
+}
+
+.navbar ul {
+    display: flex;
+    list-style: none;
+    margin-left: auto;
+}
+
+.navbar ul li{
+    padding-right: 0.75rem;
+}
+
+.active {
+    background-color: rgb(17, 93, 236);
+    color: white;
+}

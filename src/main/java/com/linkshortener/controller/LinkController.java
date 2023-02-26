@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 @Validated
 @RestController
 @CrossOrigin
+@RequestMapping("/api/links")
 public class LinkController {
     private final LinkService linkService;
     private final Logger LOGGER = LoggerFactory.getLogger(LinkController.class);
@@ -41,29 +42,20 @@ public class LinkController {
         this.linkService = linkService;
     }
 
-    @Operation(summary = "If alias was found in database will redirect to full link of current user." +
+    @Operation(summary = "If alias was found in database will return the link of current user." +
             " If user not authenticated will try to find alias in anonymousUser.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "302", description = "successfully redirected",
+            @ApiResponse(responseCode = "200", description = "successfully found redirect link",
                     content = {@Content(mediaType = "application/json",
                             schema =  @Schema(implementation = HttpHeaders.class))}),
             @ApiResponse(responseCode = "404", description = "alias was not found")
     })
     @GetMapping("/{alias}")
-    public ResponseEntity<HttpHeaders> redirectToUrl(@PathVariable String alias) {
+    public ResponseEntity<LinkDto> getLinkByAlias(@PathVariable String alias) {
         Optional<Link> link = linkService.getLinkByAlias(alias);
 
         if (link.isPresent()) {
-            HttpHeaders headers = new HttpHeaders();
-            StringBuilder url = new StringBuilder(link.get().getFullLink());
-
-            if (!url.toString().startsWith("http")) {
-                url.insert(0, "https://");
-            }
-
-            headers.add("Location", url.toString());
-
-            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+            return new ResponseEntity<>(convertToLinkDto(link.get()), HttpStatus.OK);
         }
 
         LOGGER.warn("Searched alias :{} of link does not exist", alias);
@@ -77,7 +69,7 @@ public class LinkController {
                             schema =  @Schema(implementation = LinkDto.class))}),
             @ApiResponse(responseCode = "403", description = "user not found")
     })
-    @GetMapping("/api/links")
+    @GetMapping
     public List<LinkDto> getLinks() {
         return linkService.getAllLinks().stream().map(this::convertToLinkDto).collect(Collectors.toList());
     }
@@ -88,7 +80,7 @@ public class LinkController {
             @ApiResponse(responseCode = "400", description = "not valid link"),
             @ApiResponse(responseCode = "409", description = "alias already exist")
     })
-    @PostMapping("/api/links")
+    @PostMapping
     public ResponseEntity<Void> addLink(@Valid @RequestBody LinkDto linkDto) {
         Link link = convertToLink(linkDto);
 
@@ -107,7 +99,7 @@ public class LinkController {
             @ApiResponse(responseCode = "200", description = "removed link from user"),
             @ApiResponse(responseCode = "404", description = "link with this id was not found(for this user)")
     })
-    @DeleteMapping("/api/links/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeLink(@PathVariable Long id) {
         Optional<Link> link = linkService.getLinkById(id);
 
@@ -126,7 +118,7 @@ public class LinkController {
             @ApiResponse(responseCode = "200", description = "removed all user links"),
             @ApiResponse(responseCode = "404", description = "not found user")
     })
-    @DeleteMapping("/api/links")
+    @DeleteMapping
     public void removeLinks() {
         linkService.removeAllLinks();
     }
