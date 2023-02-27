@@ -1,9 +1,12 @@
-<div class="signup mx-auto my-auto p-3 bg-white w-50 rounded ">
-    <form #formLink="ngForm" method="post" (ngSubmit)="signUp(formLink)" class="container d-flex flex-column w-100 gap-4">
+<div class="signup mx-auto my-auto p-3 bg-white w-50 rounded">
+    <form #formUser="ngForm" method="post" (ngSubmit)="signUp(formUser)" class="container d-flex flex-column w-100 gap-4">
         <p class="form-headline">Sign up to URL Shortener</p>
-        <input type="text" name="email-input" placeholder="Email" class="input form-control-lg border" required ngModel>
-        <input type="text" name="password-input" placeholder="Password" class="input form-control-lg border" ngModel>
-        <input type="text" name="password-input" placeholder="Confirm password" class="input form-control-lg border" ngModel>
+        <input type="text" name="email" placeholder="Email" class="input form-control-lg border" required ngModel>
+        <input type="password" name="password" placeholder="Password" class="input form-control-lg border" required ngModel>
+        <input type="password" name="password" placeholder="Confirm password" class="input form-control-lg border" required ngModel>
         <button type="submit" class="button btn btn-primary btn-lg w-30">Sign up</button>
     </form>
 </div>
+<ngb-alert class="mt-5" #selfClosingAlert *ngIf="message" type="danger" (closed)="message = ''">{{
+    message }}
+</ngb-alert>
