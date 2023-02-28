@@ -20,7 +20,7 @@ export class LoginComponent {
     this.http.post('http://localhost:8080/api/login', this.user, { observe: 'response' }).subscribe((res) => {
       this.router.navigate(['/app-shortener'])
     }, (error) => {
-      if (error.status = 404) {
+      if (error.status == 404) {
         this.message = "Email or password incorrect !";
       } else {
         this.message = "Something went wrong !";

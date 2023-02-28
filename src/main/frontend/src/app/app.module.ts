@@ -18,7 +18,7 @@ import { LoginComponent } from './login/login.component';
     ShortenerComponent,
     NavbarComponent,
     SignupComponent,
-    LoginComponent
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
