@@ -15,8 +15,8 @@ export class ShortenerComponent {
     fullLink: "",
     alias: ""
   }
-message!: string;
-successMessage!: string;
+  message!: string;
+  successMessage!: string;
 
   constructor(private http: HttpClient) { }
 
@@ -25,7 +25,7 @@ successMessage!: string;
     this.http.post('http://localhost:8080/api/links', this.link, { observe: 'response' }).subscribe((res) => {
       this.successMessage = "Link was saved";
     }, (error) => {
-      if (error.status = 409) {
+      if (error.status == 409) {
         this.message = "Link with this alias already exist";
       } else {
         this.message = "Something went wrong !";

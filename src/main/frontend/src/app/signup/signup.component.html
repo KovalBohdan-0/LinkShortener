@@ -1,10 +1,38 @@
 <div class="signup mx-auto my-auto p-3 bg-white w-50 rounded">
-    <form #formUser="ngForm" method="post" (ngSubmit)="signUp(formUser)" class="container d-flex flex-column w-100 gap-4">
+    <form #userForm="ngForm" method="post" (ngSubmit)="signUp(userForm)"
+        class="container d-flex flex-column w-100 gap-4">
         <p class="form-headline">Sign up to URL Shortener</p>
-        <input type="text" name="email" placeholder="Email" class="input form-control-lg border" required ngModel>
-        <input type="password" name="password" placeholder="Password" class="input form-control-lg border" required ngModel>
-        <input type="password" name="password" placeholder="Confirm password" class="input form-control-lg border" required ngModel>
-        <button type="submit" class="button btn btn-primary btn-lg w-30">Sign up</button>
+        <input type="email" minlength="5" name="email" placeholder="Email" class="input form-control-lg border" required
+            [(ngModel)]="user.email" #email="ngModel">
+        <div *ngIf="email.invalid && (email.dirty || email.touched)" class="input-alert">
+            <div *ngIf="email.errors?.['required']">
+                Email is required.
+            </div>
+            <div *ngIf="email.errors?.['minlength']">
+                Email must be at least 5 characters long.
+            </div>
+        </div>
+        <input type="password" minlength="5" maxlength="30" name="password" placeholder="Password"
+            class="input form-control-lg border" required [(ngModel)]="user.password" #password="ngModel">
+        <div *ngIf="password.invalid && (password.dirty || password.touched)" class="input-alert">
+            <div *ngIf="password.errors?.['required']">
+                Password is required.
+            </div>
+            <div *ngIf="password.errors?.['minlength']">
+                Password must be at least 5 characters long.
+            </div>
+        </div>
+        <input type="password" name="confirmPassword" placeholder="Confirm password"
+            class="input form-control-lg border" required [(ngModel)]="confirmPassword" #confirm="ngModel">
+        <div *ngIf="confirm.invalid && (confirm.dirty || confirm.touched)" class="input-alert">
+            <div *ngIf="confirm.errors?.['required']">
+                Confirm password is required.
+            </div>
+        </div>
+        <div *ngIf="(confirm.dirty || confirm.touched) && confirm.value != password.value" class="input-alert">
+            Confirm password must be the same as password.
+        </div>
+        <input type="submit" [disabled]="userForm.invalid || confirm.value != password.value" class="button btn btn-primary btn-lg w-30" value="Sign up">
     </form>
 </div>
 <ngb-alert class="mt-5" #selfClosingAlert *ngIf="message" type="danger" (closed)="message = ''">{{

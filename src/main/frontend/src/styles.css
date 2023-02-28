@@ -19,3 +19,9 @@ body{
     font-weight: 700;
     font-size: 1.25rem;
 }
+
+.input-alert {
+    color: rgb(255, 0, 0);
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
