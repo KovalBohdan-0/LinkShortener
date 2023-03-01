@@ -8,6 +8,9 @@ public class UserDto {
     @NotBlank(message = "Password is mandatory")
     private String password;
 
+    public UserDto() {
+    }
+
     public UserDto(String email, String password) {
         this.email = email;
         this.password = password;

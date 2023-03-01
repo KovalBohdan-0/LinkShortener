@@ -8,6 +8,9 @@ public class LinkDto {
     @NotBlank(message = "Alias is mandatory")
     private String alias;
 
+    public LinkDto() {
+    }
+
     public LinkDto(String fullLink, String alias) {
         this.fullLink = fullLink;
         this.alias = alias;

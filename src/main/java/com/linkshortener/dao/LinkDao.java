@@ -57,6 +57,27 @@ public class LinkDao implements Dao<Link> {
         return Optional.of(list.get(0));
     }
 
+    /**
+     * Returns link of current user by alias, if nothing found, returns empty Optional
+     *
+     * @param alias the code of link
+     * @return the found link
+     */
+    public Optional<Link> getUsersLinkByAlias(String alias, long userId) {
+        TypedQuery<Link> query = entityManager.createQuery("FROM Link link WHERE link.user.id= :userId AND link.alias = :alias", Link.class);
+        query.setParameter("alias", alias);
+        query.setParameter("userId", userId);
+        List<Link> list = query.getResultList();
+
+        if (list.size() == 0) {
+            LOGGER.warn("Link with alias :{} was not found", alias);
+
+            return Optional.empty();
+        }
+
+        return Optional.of(list.get(0));
+    }
+
     @Override
     public List<Link> getAll() {
         return entityManager.createQuery("FROM Link", Link.class)
