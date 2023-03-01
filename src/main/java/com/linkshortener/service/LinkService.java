@@ -41,6 +41,7 @@ public class LinkService {
     /**
      * Returns link by id if found, if not found in current user than returns
      * empty optional. If username not found throw UsernameNotFoundException.
+     *
      * @param id the id of link to return
      * @return optional of link, if not found - empty
      */
@@ -56,8 +57,9 @@ public class LinkService {
     }
 
     /**
-     * Returns link by alias if found, if not found in current user than returns
-     * empty optional. If username not found throw UsernameNotFoundException.
+     * Returns link by alias if found, if not found user than returns empty
+     * optional. If username not found throw UsernameNotFoundException.
+     *
      * @param alias the id of link to return
      * @return optional of link, if not found - empty
      */
@@ -72,9 +74,32 @@ public class LinkService {
         return Optional.empty();
     }
 
+    //TODO Add tests
+    /**
+     * Returns link by alias if found, if not found in current user than returns
+     * empty optional. If username not found throw UsernameNotFoundException.
+     *
+     * @param alias the id of link to return
+     * @return optional of link, if not found - empty
+     */
+    public Optional<Link> getUsersLinkByAlias(String alias) {
+        Optional<User> optionalUser = getUserFromAuthContext();
+
+        if (optionalUser.isPresent()) {
+            Optional<Link> optionalLink = linkDao.getUsersLinkByAlias(alias, optionalUser.get().getId());
+
+            if (optionalLink.isPresent()) {
+                return optionalLink;
+            }
+        }
+
+        return Optional.empty();
+    }
+
     /**
      * Returns all links of current user. If user is not authenticated, nothing
      * happens. If username not found throw UsernameNotFoundException.
+     *
      * @return all link of current user
      */
     public List<Link> getAllLinks() {
@@ -96,6 +121,7 @@ public class LinkService {
     /**
      * Adds link, sets user to current user. If user not authenticated, link
      * adds to anonymousUser. If username not found throw UsernameNotFoundException.
+     *
      * @param link the link to add to current user
      */
     @Transactional
@@ -112,6 +138,7 @@ public class LinkService {
     /**
      * Removes link by id, if link found in current user. If user not
      * authenticated, nothing happens. If username not found throw UsernameNotFoundException.
+     *
      * @param id the id of link to remove
      */
     @Transactional
@@ -155,6 +182,6 @@ public class LinkService {
     private boolean isUsersLink(Optional<User> user, Optional<Link> link) {
         return link.isPresent()
                 && user.isPresent()
-                && Objects.equals(link.get().getUser().getId(), user.get().getId());
+                && link.get().getUser().getId() == user.get().getId();
     }
 }

@@ -55,7 +55,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "users returned",
                     content = {@Content(mediaType = "application/json",
-                            schema =  @Schema(implementation = UserDto.class))}),
+                            schema = @Schema(implementation = UserDto.class))}),
             @ApiResponse(responseCode = "403", description = "forbidden for user without ADMIN authority")
     })
     @GetMapping("/users")
@@ -67,7 +67,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "user added",
                     content = {@Content(mediaType = "application/json",
-                            schema =  @Schema(implementation = AuthenticationResponse.class))}),
+                            schema = @Schema(implementation = AuthenticationResponse.class))}),
             @ApiResponse(responseCode = "400", description = "not valid user"),
             @ApiResponse(responseCode = "409", description = "email already exist")
     })
@@ -88,7 +88,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "user added",
                     content = {@Content(mediaType = "application/json",
-                            schema =  @Schema(implementation = AuthenticationResponse.class))}),
+                            schema = @Schema(implementation = AuthenticationResponse.class))}),
             @ApiResponse(responseCode = "400", description = "not valid user"),
             @ApiResponse(responseCode = "403", description = "forbidden for user without ADMIN authority"),
             @ApiResponse(responseCode = "409", description = "email already exist")
@@ -111,7 +111,7 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "login was successful",
                     content = {@Content(mediaType = "application/json",
-                            schema =  @Schema(implementation = AuthenticationResponse.class))}),
+                            schema = @Schema(implementation = AuthenticationResponse.class))}),
             @ApiResponse(responseCode = "400", description = "not valid user"),
             @ApiResponse(responseCode = "404", description = "user or password incorrect")
     })
