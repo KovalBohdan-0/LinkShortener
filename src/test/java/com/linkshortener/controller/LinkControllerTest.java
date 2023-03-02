@@ -71,7 +71,7 @@ class LinkControllerTest {
 
     @Test
     void shouldNotAddLinkWhenThisAliasAlreadyExist() throws Exception {
-        when(linkService.getLinkByAlias(anyString())).thenReturn(Optional.of(new Link()));
+        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link()));
 
         this.mockMvc.perform(post("/api/links")
                 .contentType(MediaType.APPLICATION_JSON)

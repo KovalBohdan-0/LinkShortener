@@ -34,6 +34,9 @@ class LinkServiceTest {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Mock
     private Optional<User> optionalUser;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    @Mock
+    private Optional<Link> optionalLink;
     @Mock
     private Link link;
 
@@ -77,6 +80,21 @@ class LinkServiceTest {
         boolean founded = linkService.getLinkByAlias(anyString()).isPresent();
 
         verify(linkDao).getLinkByAlias(anyString());
+        assertThat(founded).isTrue();
+    }
+
+    @Test
+    void shouldGetUsersLinkByAlias() {
+        User user = new User();
+        user.setId(1L);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(userDao.getByUsername(any())).thenReturn(Optional.of(user));
+        when(link.getUser()).thenReturn(user);
+        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.of(link));
+
+        boolean founded = linkService.getUsersLinkByAlias("alias").isPresent();
+
+        verify(linkDao).getUsersLinkByAlias("alias", 1L);
         assertThat(founded).isTrue();
     }
 
