@@ -45,7 +45,7 @@ public class LinkController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "successfully found redirect link", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = LinkDto.class))}), @ApiResponse(responseCode = "404", description = "alias was not found")})
     @GetMapping("/{alias}")
     public ResponseEntity<LinkDto> getLinkByAlias(@PathVariable String alias) {
-        Optional<Link> link = linkService.getLinkByAlias(alias);
+        Optional<Link> link = linkService.getUsersLinkByAlias(alias);
 
         if (link.isPresent()) {
             return new ResponseEntity<>(convertToLinkDto(link.get()), HttpStatus.OK);
@@ -53,7 +53,7 @@ public class LinkController {
 
         LOGGER.warn("Searched alias :{} of link does not exist", alias);
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+        }
 
     @Operation(summary = "Return current user links. Nothing will return if user not authenticated.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "returned all found links", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = LinkDto.class))}), @ApiResponse(responseCode = "403", description = "user not found")})
