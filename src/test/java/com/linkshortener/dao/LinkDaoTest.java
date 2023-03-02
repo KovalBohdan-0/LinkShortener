@@ -38,7 +38,7 @@ class LinkDaoTest {
     }
 
     @Test
-    void shouldGetLinkByShortLink() {
+    void shouldGetLinkByAlias() {
         Optional<Link> link = linkDao.getLinkByAlias("service/t.com");
 
         boolean isFound = link.isPresent();
