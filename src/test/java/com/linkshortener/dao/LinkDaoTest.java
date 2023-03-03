@@ -1,12 +1,10 @@
 package com.linkshortener.dao;
 
 import com.linkshortener.entity.Link;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,19 +16,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class LinkDaoTest {
     @Autowired
     private LinkDao linkDao;
-    private long testLinkId = 0;
-
-    @BeforeEach
-    @Rollback(false)
-    void setUp() {
-        Link link = new Link("twitch.tv/", "service/t.com");
-        linkDao.save(link);
-        testLinkId = link.getId();
-    }
 
     @Test
     void shouldGetLinkById() {
-        Optional<Link> link = linkDao.get(testLinkId);
+        Optional<Link> link = linkDao.get(1);
 
         boolean isFound = link.isPresent();
 
@@ -39,7 +28,16 @@ class LinkDaoTest {
 
     @Test
     void shouldGetLinkByAlias() {
-        Optional<Link> link = linkDao.getLinkByAlias("service/t.com");
+        Optional<Link> link = linkDao.getLinkByAlias("alias");
+
+        boolean isFound = link.isPresent();
+
+        assertThat(isFound).isTrue();
+    }
+
+    @Test
+    void shouldGetUsersLinkByAlias() {
+        Optional<Link> link = linkDao.getUsersLinkByAlias("alias", 1);
 
         boolean isFound = link.isPresent();
 
@@ -48,10 +46,9 @@ class LinkDaoTest {
 
     @Test
     void shouldGetAllLinks() {
-        linkDao.save(new Link("https://www.youtube.com", "service/you.com"));
         List<Link> links = linkDao.getAll();
 
-        boolean containTwoLinks = links.size() == 2;
+        boolean containTwoLinks = links.size() == 1;
 
         assertThat(containTwoLinks).isTrue();
     }
@@ -68,12 +65,12 @@ class LinkDaoTest {
 
     @Test
     void shouldUpdateLink() {
-        Optional<Link> link = linkDao.getLinkByAlias("service/t.com");
-        link.get().setAlias("updatedLink");
+        Optional<Link> link = linkDao.getLinkByAlias("alias");
+        link.orElseThrow().setAlias("updatedLink");
         linkDao.update(link.get());
 
         boolean updatedLinkIsFound = linkDao.getLinkByAlias("updatedLink").isPresent();
-        boolean previousLinkIsFound = linkDao.getLinkByAlias("service/t.com").isPresent();
+        boolean previousLinkIsFound = linkDao.getLinkByAlias("alias").isPresent();
 
         assertThat(updatedLinkIsFound).isTrue();
         assertThat(previousLinkIsFound).isFalse();
@@ -81,8 +78,8 @@ class LinkDaoTest {
 
     @Test
     void shouldDeleteLink() {
-        Optional<Link> link = linkDao.getLinkByAlias("service/t.com");
-        linkDao.delete(link.get());
+        Optional<Link> link = linkDao.getLinkByAlias("alias");
+        linkDao.delete(link.orElseThrow());
 
         boolean deletedLinkIsFound = linkDao.getLinkByAlias("service/t.com").isPresent();
 
@@ -91,7 +88,6 @@ class LinkDaoTest {
 
     @Test
     void shouldDeleteAllLinks() {
-        linkDao.save(new Link("linkToDelete", "shortLinkToDelete"));
         linkDao.deleteAll();
 
         boolean isDeleted = linkDao.getAll().size() == 0;

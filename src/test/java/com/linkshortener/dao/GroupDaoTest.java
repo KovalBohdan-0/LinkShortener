@@ -1,13 +1,10 @@
 package com.linkshortener.dao;
 
 import com.linkshortener.entity.Group;
-import com.linkshortener.entity.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
 
 import java.util.*;
 
@@ -18,19 +15,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 class GroupDaoTest {
     @Autowired
     private GroupDao groupDao;
-    @Autowired
-    private UserDao userDao;
-
-    @BeforeEach
-    @Rollback(false)
-    void setUp() {
-        groupDao.save(new Group("Manager", "Manager role"));
-    }
 
     @Test
     void shouldGetGroupById() {
-        long idOfTestedGroup = groupDao.getAll().get(0).getId();
-        Optional<Group> group = groupDao.get(idOfTestedGroup);
+        Optional<Group> group = groupDao.get(1);
 
         boolean isFound = group.isPresent();
 
@@ -39,7 +27,7 @@ class GroupDaoTest {
 
     @Test
     void shouldGetGroupByCode() {
-        Optional<Group> group = groupDao.getByCode("Manager");
+        Optional<Group> group = groupDao.getByCode("ADMIN");
 
         boolean isFound = group.isPresent();
 
@@ -57,20 +45,15 @@ class GroupDaoTest {
 
     @Test
     void shouldGetGroupByUserId() {
-        User user = new User("email", "pass");
-        user.setRoles(Set.of(groupDao.getByCode("Manager").orElseThrow()));
-        userDao.save(user);
-        long userId = userDao.getByUsername("email").get().getId();
-        Set<Group> foundGroups = groupDao.getGroupsByUserId(userId);
+        Set<Group> foundGroups = groupDao.getGroupsByUserId(1);
 
-        boolean groupIsFound = foundGroups.contains(groupDao.getByCode("Manager").orElseThrow());
+        boolean groupIsFound = foundGroups.contains(groupDao.getByCode("ADMIN").orElseThrow());
 
         assertThat(groupIsFound).isTrue();
     }
 
     @Test
     void shouldGetAllGroups() {
-        groupDao.save(new Group("Customer", "Customer role"));
         List<Group> groups = groupDao.getAll();
 
         boolean containTwoGroups = groups.size() == 2;
@@ -80,11 +63,11 @@ class GroupDaoTest {
 
     @Test
     void shouldSaveGroup() {
-        Group group = new Group("User", "User role");
-        boolean firstGroupIsSaved = groupDao.getAll().size() == 1;
+        Group group = new Group("User1", "User role");
+        boolean firstGroupIsSaved = groupDao.getAll().size() == 2;
         groupDao.save(group);
 
-        boolean groupIsSaved  = groupDao.getAll().size() == 2;
+        boolean groupIsSaved = groupDao.getAll().size() == 3;
 
         assertThat(firstGroupIsSaved).isTrue();
         assertThat(groupIsSaved).isTrue();
@@ -92,11 +75,11 @@ class GroupDaoTest {
 
     @Test
     void shouldUpdateGroup() {
-        Group group = groupDao.getAll().get(0);
+        Group group = groupDao.get(1).orElseThrow();
         group.setCode("Updated");
         groupDao.update(group);
 
-        Group updatedGroup = groupDao.getAll().get(0);
+        Group updatedGroup = groupDao.get(1).orElseThrow();
         boolean isSaved = updatedGroup.getCode().equals("Updated");
 
         assertThat(isSaved).isTrue();
@@ -104,7 +87,7 @@ class GroupDaoTest {
 
     @Test
     void shouldDeleteRole() {
-        Group group = groupDao.getAll().get(0);
+        Group group = groupDao.get(1).orElseThrow();
         groupDao.delete(group);
 
         Optional<Group> deletedUser = groupDao.get(group.getId());
@@ -115,7 +98,6 @@ class GroupDaoTest {
 
     @Test
     void shouldDeleteAllRoles() {
-        groupDao.save(new Group("deleteAll", "to delete all"));
         groupDao.deleteAll();
 
         boolean isDeleted = groupDao.getAll().size() == 0;
