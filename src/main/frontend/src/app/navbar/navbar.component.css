@@ -1,5 +1,5 @@
 .navbar {
-    width: 50%;
+    width: fit-content;
     margin: 0 auto;
     margin-bottom: 3rem;
 }
@@ -25,7 +25,7 @@
     padding: 0;
 }
 
-.navbar ul li{
+.navbar ul li {
     padding-right: 0.75rem;
 }
 
@@ -34,8 +34,8 @@
     color: white;
 }
 
-@media screen and(max-width: 15rem) {
-    .navbar ul {
+@media screen and (max-width: 1000px) {
+    .navbar {
         margin: 0 auto;
     }
 }
