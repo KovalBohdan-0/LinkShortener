@@ -5,7 +5,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,16 +12,12 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
-@Import(UserDao.class)
+@Import({UserDao.class, GroupDao.class})
 class UserDaoTest {
     @Autowired
     private UserDao userDao;
-
-    @BeforeEach
-    @Rollback(false)
-    void setUp() {
-        userDao.save(new User("first@gmail.com", "pass"));
-    }
+    @Autowired
+    private GroupDao groupDao;
 
     @Test
     void shouldGetUserById() {
@@ -35,7 +30,7 @@ class UserDaoTest {
 
     @Test
     void shouldGetUserByUsername() {
-        User user = userDao.getByUsername("first@gmail.com").orElseThrow();
+        User user = userDao.getByUsername("Admin").orElseThrow();
         User notExsitingUser = userDao.getByUsername("first1@gmail.com").orElse(null);
 
         assertThat(user).isNotNull();
@@ -44,7 +39,6 @@ class UserDaoTest {
 
     @Test
     void shouldGetAllUsers() {
-        userDao.save(new User("second@gmail.com", "pass"));
         List<User> users = userDao.getAll();
 
         boolean containTwoUsers = users.size() == 2;
@@ -64,11 +58,11 @@ class UserDaoTest {
 
     @Test
     void shouldUpdateUser() {
-        User user = userDao.getByUsername("first@gmail.com").orElseThrow();
+        User user = userDao.getByUsername("Admin").orElseThrow();
         user.setEmail("updated@gmail.com");
         userDao.update(user);
 
-        User previousUser = userDao.getByUsername("first@gmail.com").orElse(null);
+        User previousUser = userDao.getByUsername("Admin").orElse(null);
         User updatedUser = userDao.getByUsername("updated@gmail.com").orElseThrow();
 
         assertThat(updatedUser).isNotNull();
@@ -77,17 +71,16 @@ class UserDaoTest {
 
     @Test
     void shouldDeleteUser() {
-        User user = userDao.getByUsername("first@gmail.com").orElseThrow();
+        User user = userDao.getByUsername("Admin").orElseThrow();
         userDao.delete(user);
 
-        User deletedUser = userDao.getByUsername("first@gmail.com").orElse(null);
+        User deletedUser = userDao.getByUsername("Admin").orElse(null);
 
         assertThat(deletedUser).isNull();
     }
 
     @Test
     void shouldDeleteAllUsers() {
-        userDao.save(new User());
         userDao.deleteAll();
 
         boolean isDeleted = userDao.getAll().size() == 0;

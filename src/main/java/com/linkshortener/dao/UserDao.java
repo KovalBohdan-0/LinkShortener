@@ -76,7 +76,9 @@ public class UserDao implements Dao<User>{
 
     @Override
     public void deleteAll() {
+        Query queryToDeleteLinks = entityManager.createQuery("DELETE FROM Link");
         Query query = entityManager.createQuery("DELETE FROM users");
+        queryToDeleteLinks.executeUpdate();
         query.executeUpdate();
     }
 }

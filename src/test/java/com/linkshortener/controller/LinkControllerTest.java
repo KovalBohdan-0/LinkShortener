@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -21,6 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource(properties = {
+        "spring.sql.init.mode=never"
+})
 class LinkControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -102,7 +106,6 @@ class LinkControllerTest {
     @WithMockUser
     void shouldNotRemoveLinkWhenNotFound() throws Exception {
         when(linkService.getLinkById(anyLong())).thenReturn(Optional.empty());
-
         this.mockMvc.perform(delete("/api/links/{id}", 1L)).andExpect(status().isNotFound());
 
         verify(linkService, never()).removeLink(anyLong());
