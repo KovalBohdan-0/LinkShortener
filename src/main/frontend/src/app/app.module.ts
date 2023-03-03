@@ -12,6 +12,10 @@ import { LinkService } from './link.service';
 import { SignupComponent } from './signup/signup.component';
 import { LoginComponent } from './login/login.component';
 import { AuthService } from './auth.service';
+import { RedirectComponent } from './redirect/redirect.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+import { MyurlsComponent } from './myurls/myurls.component';
+import { MyurlComponent } from './myurl/myurl.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +24,10 @@ import { AuthService } from './auth.service';
     NavbarComponent,
     SignupComponent,
     LoginComponent,
+    RedirectComponent,
+    NotFoundComponent,
+    MyurlsComponent,
+    MyurlComponent,
   ],
   imports: [
     BrowserModule,

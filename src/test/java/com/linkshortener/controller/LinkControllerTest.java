@@ -29,20 +29,20 @@ class LinkControllerTest {
 
     @Test
     void shouldGetLinkByAlias() throws Exception {
-        when(linkService.getLinkByAlias(anyString())).thenReturn(Optional.of(new Link("fullLink", "alias")));
+        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link("fullLink", "alias")));
 
         this.mockMvc.perform(get("/api/links/{alias}", "alias")).andExpect(status().isOk());
 
-        verify(linkService).getLinkByAlias(anyString());
+        verify(linkService).getUsersLinkByAlias(anyString());
     }
 
     @Test
     void shouldNotGetLinkByNotFoundAlias() throws Exception {
-        when(linkService.getLinkByAlias(anyString())).thenReturn(Optional.empty());
+        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.empty());
 
         this.mockMvc.perform(get("/api/links/{alias}", "alias")).andExpect(status().isNotFound());
 
-        verify(linkService).getLinkByAlias(anyString());
+        verify(linkService).getUsersLinkByAlias(anyString());
     }
 
     @Test

@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Link } from '../link';
@@ -28,7 +28,7 @@ export class ShortenerComponent {
     this.link = formLink.value;
     this.http.post('http://localhost:8080/api/links', this.link, { headers: headers }).subscribe({
       next: (res) => {
-        this.successMessage = "Link was saved";
+        this.successMessage = "Link was saved. Short link: localhost:4200/l/" + this.link.alias;
       },
       error: (error) => {
         if (error.status == 409) {
