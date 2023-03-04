@@ -136,6 +136,24 @@ public class LinkService {
     }
 
     /**
+     * Updates link, sets fullLink to new. If username not found throw
+     * UsernameNotFoundException.
+     *
+     * @param link the link to update to current user
+     */
+    @Transactional
+    public void updateLink(Link link) {
+        Optional<User> optionalUser = getUserFromAuthContext();
+        Optional<Link> updatedLink = getUsersLinkByAlias(link.getAlias());
+
+        if (isUsersLink(optionalUser, updatedLink)) {
+            updatedLink.orElseThrow().setFullLink(link.getFullLink());
+            linkDao.update(updatedLink.get());
+            LOGGER.info("Update link :{} to user with username :{}", link, link.getUser().getEmail());
+        }
+    }
+
+    /**
      * Removes link by id, if link found in current user. If user not
      * authenticated, nothing happens. If username not found throw UsernameNotFoundException.
      *
@@ -182,6 +200,6 @@ public class LinkService {
     private boolean isUsersLink(Optional<User> user, Optional<Link> link) {
         return link.isPresent()
                 && user.isPresent()
-                && link.get().getUser().getId() == user.get().getId();
+                && Objects.equals(link.get().getUser().getId(), user.get().getId());
     }
 }

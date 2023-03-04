@@ -94,4 +94,22 @@ class LinkDaoTest {
 
         assertThat(isDeleted).isTrue();
     }
+
+    @Test
+    void shouldDeleteAllUserLinks() {
+        linkDao.deleteAllByUserId(1);
+
+        boolean isDeleted = linkDao.getAll().size() == 0;
+
+        assertThat(isDeleted).isTrue();
+    }
+
+    @Test
+    void shouldNotDeleteLinksOfOtherUsers() {
+        linkDao.deleteAllByUserId(2);
+
+        boolean isNotDeleted = linkDao.getAll().size() != 0;
+
+        assertThat(isNotDeleted).isTrue();
+    }
 }

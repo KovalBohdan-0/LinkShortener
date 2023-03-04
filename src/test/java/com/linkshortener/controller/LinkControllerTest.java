@@ -70,7 +70,7 @@ class LinkControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"alias\":  \"linkShortener.com/youtube\"}")).andExpect(status().isOk());
 
-        verify(linkService).addLink(any());
+        verify(linkService).addLink(any(Link.class));
     }
 
     @Test
@@ -81,7 +81,7 @@ class LinkControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"alias\":  \"linkShortener.com/youtube\"}")).andExpect(status().isConflict());
 
-        verify(linkService, never()).addLink(any());
+        verify(linkService, never()).addLink(any(Link.class));
     }
 
     @Test
@@ -90,14 +90,36 @@ class LinkControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"}")).andExpect(status().isBadRequest());
 
-        verify(linkService, never()).addLink(any());
+        verify(linkService, never()).addLink(any(Link.class));
+    }
+
+    @Test
+    void shouldUpdateLink() throws Exception {
+        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link()));
+        this.mockMvc.perform(put("/api/links/{alias}", "alias")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"alias\":  \"alias\"}")).andExpect(status().isOk());
+
+        verify(linkService).updateLink(any(Link.class));
+    }
+
+    @Test
+    void shouldCreateNewAndDeletePreviousLinkWhenUpdatingWithNewAlias() throws Exception {
+        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link()));
+        this.mockMvc.perform(put("/api/links/{alias}", "alias")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"alias\":  \"not the same alias\"}")).andExpect(status().isOk());
+
+        verify(linkService, never()).updateLink(any(Link.class));
+        verify(linkService).removeLink(anyLong());
+        verify(linkService).addLink(any(Link.class));
     }
 
     @Test
     @WithMockUser
     void shouldRemoveLink() throws Exception {
-        when(linkService.getLinkById(anyLong())).thenReturn(Optional.of(new Link()));
-        this.mockMvc.perform(delete("/api/links/{id}", 1L)).andExpect(status().isOk());
+        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link()));
+        this.mockMvc.perform(delete("/api/links/{alias}", "alias")).andExpect(status().isOk());
 
         verify(linkService).removeLink(anyLong());
     }
@@ -105,8 +127,8 @@ class LinkControllerTest {
     @Test
     @WithMockUser
     void shouldNotRemoveLinkWhenNotFound() throws Exception {
-        when(linkService.getLinkById(anyLong())).thenReturn(Optional.empty());
-        this.mockMvc.perform(delete("/api/links/{id}", 1L)).andExpect(status().isNotFound());
+        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.empty());
+        this.mockMvc.perform(delete("/api/links/{alias}", "alias")).andExpect(status().isNotFound());
 
         verify(linkService, never()).removeLink(anyLong());
     }
