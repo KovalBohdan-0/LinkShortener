@@ -51,7 +51,8 @@ public class UserController {
         this.authenticationManager = authenticationManager;
     }
 
-    @Operation(summary = "If user has ADMIN authorities than it wil return all users. If user not authenticated than the result will be empty array.")
+    @Operation(summary = "Returns all users",
+            description = "Returns all users. If user has ADMIN authorities than it wil return all users. If user not authenticated than the result will be empty array.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "users returned",
                     content = {@Content(mediaType = "application/json",
@@ -63,7 +64,8 @@ public class UserController {
         return userService.getAllUsers().stream().map(this::convertToUserDto).collect(Collectors.toList());
     }
 
-    @Operation(summary = "Creates user with USER authorities, fails if email is already used.")
+    @Operation(summary = "Creates user",
+    description = "Creates user with USER authorities, fails if email is already used.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "user added",
                     content = {@Content(mediaType = "application/json",
@@ -84,7 +86,8 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
-    @Operation(summary = "Creates user with ADMIN authorities, fails if email is already used and user doesn't have ADMIN authorities.")
+    @Operation(summary = "Creates user" ,
+    description = "Creates user with ADMIN authorities, fails if email is already used and user doesn't have ADMIN authorities.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "user added",
                     content = {@Content(mediaType = "application/json",
@@ -107,7 +110,8 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
-    @Operation(summary = "Logins and returns jwt token for authorization")
+    @Operation(summary = "Logins user",
+    description = "Logins and returns jwt token for authorization")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "login was successful",
                     content = {@Content(mediaType = "application/json",
@@ -127,7 +131,8 @@ public class UserController {
         throw new UsernameNotFoundException("User not found, email :" + userDto.getEmail());
     }
 
-    @Operation(summary = "Delete all users if signed as admin")
+    @Operation(summary = "Delete all users",
+    description = "Delete all users if signed as admin")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "removed all users"),
             @ApiResponse(responseCode = "403", description = "forbidden for user without ADMIN authority")

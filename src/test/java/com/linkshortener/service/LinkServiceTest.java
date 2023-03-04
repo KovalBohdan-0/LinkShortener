@@ -34,9 +34,6 @@ class LinkServiceTest {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Mock
     private Optional<User> optionalUser;
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    @Mock
-    private Optional<Link> optionalLink;
     @Mock
     private Link link;
 
@@ -47,7 +44,6 @@ class LinkServiceTest {
         autoCloseable = MockitoAnnotations.openMocks(this);
         linkService = new LinkService(linkDao, userDao);
         SecurityContextHolder.setContext(securityContext);
-        when(userDao.getByUsername(authentication.getName())).thenReturn(optionalUser);
     }
 
     @AfterEach
@@ -102,6 +98,7 @@ class LinkServiceTest {
     void shouldGetAllLinks() {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
+        when(userDao.getByUsername(authentication.getName())).thenReturn(optionalUser);
         when(optionalUser.get()).thenReturn(user);
 
         linkService.getAllLinks();
@@ -122,11 +119,28 @@ class LinkServiceTest {
     void shouldAddLink() {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
+        when(userDao.getByUsername(authentication.getName())).thenReturn(optionalUser);
         when(link.getUser()).thenReturn(user);
 
         linkService.addLink(link);
 
         verify(linkDao).save(any(Link.class));
+    }
+
+    @Test
+    void shouldUpdateLink() {
+        User user = new User();
+        user.setId(1L);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(link.getAlias()).thenReturn("alias");
+        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.of(link));
+        when(userDao.getByUsername(authentication.getName())).thenReturn(Optional.of(user));
+        when(link.getUser()).thenReturn(user);
+
+
+        linkService.updateLink(link);
+
+        verify(linkDao).update(any(Link.class));
     }
 
     @Test
@@ -147,6 +161,7 @@ class LinkServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
         when(optionalUser.get()).thenReturn(user);
+        when(userDao.getByUsername(authentication.getName())).thenReturn(optionalUser);
         when(user.getEmail()).thenReturn("email");
 
         linkService.removeAllLinks();
