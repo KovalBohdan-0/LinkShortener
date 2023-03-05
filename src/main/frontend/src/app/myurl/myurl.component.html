@@ -1,14 +1,32 @@
-<div class="p-4 bg-primary rounded-4 m-1 text-white d-flex">
+<div class="myurl p-4 bg-primary rounded-4 m-1 text-white d-flex flex-column">
     <div>
-        {{link.id}}.
-        <a href="{{link.fullLink}}" class="text-white">{{link.fullLink}}</a>
+        <img src="{{getFavicon(link)}}" alt="">
+        <a href="{{link.fullLink}}" class="text-white">{{(link.fullLink.length>40)? (link.fullLink |
+            slice:0:40)+'...':(link.fullLink)}}</a>
         <div class="">
-            <a href="{{link.alias}}" class="text-white">{{link.alias}}</a>
+            <a href="http://localhost:4200/l/{{link.alias}}" class="text-white">localhost:4200/l/{{link.alias}}</a>
         </div>
     </div>
     <div class="ms-auto">
-        <button class="btn btn-light url-button">Delete</button>
-        <button class="btn btn-light url-button">Update</button>
-        <button class="btn btn-light url-button">Copy</button>
+        <button class="btn btn-light url-button" [disabled]="" (click)="openModal(content)">Change</button>
+        <button class="btn btn-secondary bg-gradient url-button" (click)="copyToClipboard(link)"
+            ngbPopover="Link copied: localhost:4200/l/{{link.alias}}">Copy</button>
+        <button class="btn btn-danger bg-gradient url-button" (click)="deleteLink(link)">Delete</button>
     </div>
 </div>
+
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">Update link</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form #formLink="ngForm" method="post" (ngSubmit)="updateLink(formLink)"
+        class="container d-flex flex-column w-100 gap-4">
+        <input type="text" name="fullLink" placeholder="Url" class="input form-control-lg border"
+            required ngModel #link="ngModel">
+        <input type="text" name="alias" placeholder="Alias" class="input form-control-lg border" ngModel #alias="ngModel">
+    </form>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="updateLink(formLink)">Save</button>
+    </div>
+</ng-template>

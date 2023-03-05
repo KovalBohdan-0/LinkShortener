@@ -1,6 +1,6 @@
-<div class="w-50 mx-auto">
+<div class="myurls w-50 mx-auto">
     <div *ngFor="let link of currentLinks">
-        <app-myurl [link]="link"></app-myurl>
+        <app-myurl [currentLinks]="currentLinks" [link]="link"></app-myurl>
     </div>
     
 <div class="d-flex justify-content-between p-2">
@@ -12,9 +12,9 @@
 	>
 	</ngb-pagination>
 
-	<select class="form-select" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="updateLinks()">
-		<option [ngValue]="2">2 items per page</option>
-		<option [ngValue]="4">4 items per page</option>
-		<option [ngValue]="6">6 items per page</option>
+	<select class="form-select bg-primary border border-primary fw-normal text-white" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="updateLinks()">
+		<option [ngValue]="2">2 links per page</option>
+		<option [ngValue]="4">4 links per page</option>
+		<option [ngValue]="6">6 links per page</option>
 	</select>
 </div>

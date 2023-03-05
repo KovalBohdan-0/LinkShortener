@@ -108,6 +108,7 @@ public class LinkController {
                 linkService.updateLink(link);
             } else {
                 linkService.removeLink(existingLink.get().getId());
+                //TODO
                 linkService.addLink(link);
             }
 

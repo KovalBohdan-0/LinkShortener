@@ -12,6 +12,10 @@ export class AuthService {
         return this.http.post('http://localhost:8080/api/login', user, { observe: 'response' });
     }
 
+    signUp(user: User): Observable<HttpResponse<Object>> {
+        return this.http.post('http://localhost:8080/api/users', user, { observe: 'response' })
+    }
+
     logOut() {
         localStorage.removeItem("token");
     }

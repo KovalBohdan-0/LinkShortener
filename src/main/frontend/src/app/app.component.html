@@ -2,4 +2,8 @@
   <div class="spacer"></div>
   <app-navbar></app-navbar>
   <router-outlet></router-outlet>
+  <div class="toast-container">
+    <ngb-toast [ngClass]="toast.classname" *ngFor="let toast of toastService.toasts" [header]="toast.header"
+      [autohide]="true" [delay]="toast.delay || 5000" (hiddden)="toastService.remove(toast)">{{toast.body}}</ngb-toast>
+  </div>
 </div>

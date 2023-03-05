@@ -1,3 +1,7 @@
 .urls-table {
     border-radius: 1rem !important;
 }
+
+.myurls {
+    min-width: 19rem;
+}

@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { LinkService } from '../link.service';
 
 @Component({
   selector: 'app-redirect',
@@ -9,7 +10,7 @@ import { AuthService } from '../auth.service';
   styleUrls: ['./redirect.component.css']
 })
 export class RedirectComponent {
-  constructor(private activeRoute: ActivatedRoute, private authService: AuthService, private http: HttpClient, private router: Router) {
+  constructor(private activeRoute: ActivatedRoute, private authService: AuthService, private http: HttpClient, private router: Router, private linkService: LinkService) {
     let params: any = activeRoute.params;
     let alias = params.value.alias;
 
@@ -17,15 +18,7 @@ export class RedirectComponent {
   }
 
   getLink(alias: string) {
-    let headers;
-    
-    if (this.authService.getToken() != null) {
-      headers = new HttpHeaders({
-        'Authorization': "Bearer " + this.authService.getToken()
-      });
-    }
-   
-    this.http.get('http://localhost:8080/api/links/' + alias, { headers: headers, observe: 'response'}).subscribe({
+    this.linkService.getLink(alias).subscribe({
       next: (response: any) => {
         window.location.href = response.body.fullLink;
       },
