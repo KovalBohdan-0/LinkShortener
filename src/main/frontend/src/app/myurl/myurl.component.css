@@ -3,6 +3,10 @@ a {
     font-weight: 500;
 }
 
+.myurl {
+    min-width: 17rem;
+}
+
 .url-button {
     margin: 0.1rem;
     border: none;

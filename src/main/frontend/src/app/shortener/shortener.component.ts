@@ -1,8 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { AuthService } from '../auth.service';
 import { Link } from '../link';
+import { LinkService } from '../link.service';
+import { ToastService } from '../toast.service';
 
 
 @Component({
@@ -19,25 +19,48 @@ export class ShortenerComponent {
   message!: string;
   successMessage!: string;
 
-  constructor(private http: HttpClient, private authService: AuthService) { }
+  constructor(private linkService: LinkService, public toastService: ToastService) { }
 
   shortLink(formLink: NgForm): void {
-    let headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': "Bearer " +  this.authService.getToken()});
+    if (formLink.value.alias == "") {
+      formLink.value.alias = this.setRandomAlias();
+    }
+
     this.link = formLink.value;
-    this.http.post('http://localhost:8080/api/links', this.link, { headers: headers }).subscribe({
-      next: (res) => {
-        this.successMessage = "Link was saved. Short link: localhost:4200/l/" + this.link.alias;
+    this.linkService.addLink(formLink).subscribe({
+      next: (response) => {
+        this.toastService.addSuccess("Creating short link", "Link was saved. Short link: localhost:4200/l/" + this.link.alias);
       },
       error: (error) => {
         if (error.status == 409) {
-          this.message = "Link with this alias already exist";
+          this.toastService.addError("Creating short link", "Link with this alias already exist");
         } else {
-          this.message = "Something went wrong !";
+          this.toastService.addError("Creating short link", "Something went wrong !");
         }
       }
     });
+  }
+
+  randomString(length): string {
+    let randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+
+    for (let i = 0; i < length; i++) {
+      result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+    }
+
+    return result;
+  }
+
+  setRandomAlias() {
+    let randomAlias = this.randomString(5);
+    this.linkService.getLink(randomAlias).subscribe(response => {
+      if (response.body != null) {
+        this.setRandomAlias();
+      } 
+    });
+
+    return randomAlias;
   }
 }
 

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ToastService } from './toast.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,6 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Links shortener';
+
+  constructor(public toastService: ToastService) {}
 }

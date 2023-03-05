@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { ToastService } from '../toast.service';
 import User from '../user';
 
 @Component({
@@ -13,21 +14,21 @@ export class LoginComponent {
   user!: User;
   message!: string;
 
-  constructor(private router: Router, private authService: AuthService) { }
+  constructor(private router: Router, private authService: AuthService, public toastService: ToastService) { }
 
   logIn(formUser: NgForm): void {
     this.user = formUser.value;
     this.authService.logIn(this.user).subscribe({
       next: (response: any) => {
-        console.log(response.body.jwt);
         this.authService.storeToken(response.body.jwt);
+        this.toastService.addSuccess("Login", "Successfully logged")
         this.router.navigate(['/app-shortener']);
       },
       error: (error) => {
         if (error.status == 404) {
-          this.message = "Email or password incorrect !";
+          this.toastService.addError("Login error", "Email or password is incorrect !")
         } else {
-          this.message = "Something went wrong !";
+          this.toastService.addError("Login error", "Something went wrong Something went wrong !")
         }
       }
     });

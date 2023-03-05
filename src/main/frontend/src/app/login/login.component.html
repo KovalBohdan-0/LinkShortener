@@ -1,13 +1,12 @@
 <div class="login mx-auto my-auto p-3 bg-white w-50 rounded ">
-    <form #formUser="ngForm" method="post" (ngSubmit)="logIn(formUser)" class="container d-flex flex-column w-100 gap-4">
+    <form #formUser="ngForm" method="post" (ngSubmit)="logIn(formUser)"
+        class="container d-flex flex-column w-100 gap-4">
         <p class="form-headline">Login to URL Shortener</p>
         <input type="text" name="email" placeholder="Email" class="input form-control-lg border" required ngModel>
-        <input type="password" name="password" placeholder="Password" class="input form-control-lg border" required ngModel>
+        <input type="password" name="password" placeholder="Password" class="input form-control-lg border" required
+            ngModel>
         <button type="submit" class="button btn btn-primary btn-lg w-30">Log in</button>
         <p class="form-headline mx-auto fs-4">Or</p>
         <button type="button" (click)="redirectToSignup()" class="button btn btn-primary btn-lg w-30">Sign up</button>
     </form>
 </div>
-<ngb-alert class="mt-5" #selfClosingAlert *ngIf="message" type="danger" (closed)="message = ''">{{
-    message }}
-</ngb-alert>

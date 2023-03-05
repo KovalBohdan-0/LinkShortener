@@ -3,14 +3,11 @@
         class="container d-flex flex-column w-100 gap-4">
         <p class="form-headline">Free URL Shortener</p>
         <input type="text" name="fullLink" placeholder="Enter URL to short" class="input form-control-lg border"
-            required ngModel>
-        <input type="text" name="alias" placeholder="Alias" class="input form-control-lg border" ngModel>
-        <button type="submit" class="button btn btn-primary btn-lg w-30">Short URL</button>
+            required ngModel #link="ngModel">
+        <div *ngIf="link.value == '' && (link.dirty || link.touched)" class="input-alert">
+            You need to add a link
+        </div>
+        <input type="text" name="alias" placeholder="Alias (optional)" class="input form-control-lg border" ngModel>
+        <button type="submit" [disabled]="link.value == ''" class="button btn btn-primary btn-lg w-30">Short URL</button>
     </form>
 </div>
-<ngb-alert class="mt-5" #selfClosingAlert *ngIf="message" type="danger" (closed)="message = ''">{{
-    message }}
-</ngb-alert>
-<ngb-alert class="mt-5" #selfClosingAlert *ngIf="successMessage" type="success" (closed)="successMessage = ''">{{
-    successMessage }}
-</ngb-alert>

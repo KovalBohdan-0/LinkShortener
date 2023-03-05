@@ -16,6 +16,7 @@ import { RedirectComponent } from './redirect/redirect.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { MyurlsComponent } from './myurls/myurls.component';
 import { MyurlComponent } from './myurl/myurl.component';
+import { ToastService } from './toast.service';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,7 @@ import { MyurlComponent } from './myurl/myurl.component';
     FormsModule,
     HttpClientModule
   ],
-  providers: [LinkService, AuthService],
+  providers: [LinkService, AuthService, ToastService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
