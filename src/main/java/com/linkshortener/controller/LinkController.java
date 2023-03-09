@@ -9,15 +9,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +30,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/links")
 public class LinkController {
     private final LinkService linkService;
-    private final Logger LOGGER = LoggerFactory.getLogger(LinkController.class);
 
     public LinkController(LinkService linkService) {
         this.linkService = linkService;
@@ -49,15 +43,8 @@ public class LinkController {
                             schema = @Schema(implementation = LinkDto.class))}),
             @ApiResponse(responseCode = "404", description = "alias was not found")})
     @GetMapping("/{alias}")
-    public ResponseEntity<LinkDto> getLinkByAlias(@PathVariable String alias) {
-        Optional<Link> link = linkService.getUsersLinkByAlias(alias);
-
-        if (link.isPresent()) {
-            return new ResponseEntity<>(convertToLinkDto(link.get()), HttpStatus.OK);
-        }
-
-        LOGGER.warn("Searched alias :{} of link does not exist", alias);
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public LinkDto getLinkByAlias(@PathVariable String alias) {
+            return convertToLinkDto(linkService.getUsersLinkByAlias(alias));
     }
 
     @Operation(summary = "Returns all links",
@@ -66,7 +53,7 @@ public class LinkController {
             @ApiResponse(responseCode = "200", description = "returned all found links",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = LinkDto.class))}),
-            @ApiResponse(responseCode = "403", description = "user not found")})
+            @ApiResponse(responseCode = "403", description = "forbidden to anonymousUser")})
     @GetMapping
     public List<LinkDto> getLinks() {
         return linkService.getAllLinks().stream().map(this::convertToLinkDto).collect(Collectors.toList());
@@ -79,77 +66,55 @@ public class LinkController {
             @ApiResponse(responseCode = "400", description = "not valid link"),
             @ApiResponse(responseCode = "409", description = "alias already exist")})
     @PostMapping
-    public ResponseEntity<Void> addLink(@Valid @RequestBody LinkDto linkDto) {
+    public void addLink(@Valid @RequestBody LinkDto linkDto) {
         Link link = convertToLink(linkDto);
+        linkService.addLink(link);
+    }
 
-        if (linkService.getUsersLinkByAlias(link.getAlias()).isEmpty()) {
-            linkService.addLink(link);
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-
-        LOGGER.warn("Link with alias :{} already exist", linkDto.getAlias());
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+    @Operation(summary = "Adds link view",
+            description = "Adds one to links views counter")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "added to links views counter"),
+            @ApiResponse(responseCode = "404", description = "link with this alias was not found")})
+    @PutMapping("/{alias}/view")
+    public void addLinkView(@PathVariable String alias) {
+        linkService.addLinkView(alias);
     }
 
     @Operation(summary = "Updates link",
-            description = "Updates link of current user. Fails if users link not found by alias. If user wants to update alias, deletes previous link and creates new.")
+            description = "Updates link from current user, if alias is the same updates link, if different, creates new")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "link added"),
+            @ApiResponse(responseCode = "200", description = "updated link for current user"),
             @ApiResponse(responseCode = "400", description = "not valid link"),
             @ApiResponse(responseCode = "409", description = "alias already exist")})
     @PutMapping("/{alias}")
-    public ResponseEntity<Void> updateLink(@Valid @RequestBody LinkDto linkDto, @PathVariable String alias) {
+    public void updateLink(@Valid @RequestBody LinkDto linkDto, @PathVariable String alias) {
         Link link = convertToLink(linkDto);
-        Optional<Link> existingLink = linkService.getUsersLinkByAlias(alias);
-
-        if (existingLink.isPresent()) {
-            if (link.getAlias().equals(alias)) {
-                linkService.updateLink(link);
-            } else {
-                linkService.removeLink(existingLink.get().getId());
-                //TODO
-                linkService.addLink(link);
-            }
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-
-        LOGGER.warn("Link with alias :{} was not found", linkDto.getAlias());
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+        linkService.updateLink(link, alias);
     }
 
     @Operation(summary = "Removes link",
             description = "Removes link from current user. Not removes links from anonymousUser.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "removed link from user"),
-            @ApiResponse(responseCode = "404", description = "link with this id was not found(for this user)")})
+            @ApiResponse(responseCode = "404", description = "link with this alias was not found(for this user)")})
     @DeleteMapping("/{alias}")
-    public ResponseEntity<Void> removeLinkByAlias(@PathVariable String alias) {
-        Optional<Link> link = linkService.getUsersLinkByAlias(alias);
-
-        if (link.isPresent()) {
-            linkService.removeLink(link.get().getId());
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-
-        LOGGER.warn("Searched link with id :{} does not exist", alias);
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public void removeLinkByAlias(@PathVariable String alias) {
+        linkService.removeLink(alias);
     }
 
     @Operation(summary = "Removes all links",
             description = "Removes all links from current user. Not removes links from anonymousUser.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "removed all user links"),
-            @ApiResponse(responseCode = "404", description = "not found user")})
+            @ApiResponse(responseCode = "403", description = "forbidden to anonymousUser")})
     @DeleteMapping
     public void removeLinks() {
         linkService.removeAllLinks();
     }
 
     private LinkDto convertToLinkDto(Link link) {
-        return new LinkDto(link.getFullLink(), link.getAlias());
+        return new LinkDto(link.getFullLink(), link.getAlias(), link.getViews(), link.getDate());
     }
 
     private Link convertToLink(LinkDto linkDto) {

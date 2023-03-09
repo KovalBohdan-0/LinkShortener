@@ -30,6 +30,7 @@ export class ShortenerComponent {
     this.linkService.addLink(formLink).subscribe({
       next: (response) => {
         this.toastService.addSuccess("Creating short link", "Link was saved. Short link: localhost:4200/l/" + this.link.alias);
+        this.link.alias = "";
       },
       error: (error) => {
         if (error.status == 409) {
@@ -42,14 +43,7 @@ export class ShortenerComponent {
   }
 
   randomString(length): string {
-    let randomChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-
-    for (let i = 0; i < length; i++) {
-      result += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
-    }
-
-    return result;
+    return self.crypto.randomUUID().toString().substring(0, length);
   }
 
   setRandomAlias() {

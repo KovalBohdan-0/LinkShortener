@@ -37,6 +37,10 @@ export class LinkService {
     return this.http.post(this.domain, formLink.value, { headers: this.headers, observe: "response" });
   }
 
+  addLinkView(alias): Observable<HttpResponse<Object>> {
+    return this.http.put(this.domain + "/" + alias + "/view",{} , { headers: this.headers, observe: "response" });
+  }
+
   updateLink(link, previousAlias) {
     return this.http.put(this.domain + "/" + previousAlias, link, { headers: this.headers, observe: "response" })
   }

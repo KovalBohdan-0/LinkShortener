@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { LinkService } from '../link.service';
+import { MyurlsComponent } from '../myurls/myurls.component';
+import { ToastService } from '../toast.service';
 
 @Component({
   selector: 'app-myurl',
@@ -13,7 +15,7 @@ export class MyurlComponent {
   updateResult: string;
 
 
-  constructor(private linkService: LinkService, private modalService: NgbModal) {
+  constructor(private linkService: LinkService, private modalService: NgbModal, public toastService: ToastService) {
 
   }
 
@@ -27,7 +29,18 @@ export class MyurlComponent {
   }
 
   deleteLink(link) {
-    this.linkService.deleteLink(link).subscribe(response => console.log(response));
+    this.linkService.deleteLink(link).subscribe({
+      next: (response: any) => {
+        this.toastService.addSuccess("Deleting link", "Link was successfully deleted");
+      },
+      error: (error: any) => {
+        if (error.status == "404") {
+          this.toastService.addError("Deleting link", "Link with this alias was not found!");
+        } else {
+          this.toastService.addError("Deleting link", "Something went wrong");
+        }
+      }
+    });
     this.links.splice(this.links.indexOf(link), 1);
   }
 
@@ -55,7 +68,19 @@ export class MyurlComponent {
       newLink.fullLink = this.link.fullLink;
     }
 
-    this.linkService.updateLink(newLink, this.link.alias).subscribe(response => console.log(response));
-    //TODO
+    this.linkService.updateLink(newLink, this.link.alias).subscribe({
+      next: (response: any) => {
+        this.toastService.addSuccess("Updating link", "Link was successfully updated");
+      },
+      error: (error: any) => {
+        if (error.status == "409") {
+          this.toastService.addError("Updating link", "Link with this alias already exist!");
+        } else {
+          this.toastService.addError("Updating link", "Something went wrong");
+        }
+      }
+    });
+
+    link = newLink;
   }
 }

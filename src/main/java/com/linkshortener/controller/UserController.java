@@ -79,10 +79,11 @@ public class UserController {
 
         if (user.isEmpty()) {
             userService.addUser(convertToUser(userDto), UserGroup.USER);
+            LOGGER.info("User with email :{} was registered", userDto.getEmail());
+
             return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
         }
 
-        LOGGER.warn("User with email :{} already exist", userDto.getEmail());
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
@@ -102,11 +103,11 @@ public class UserController {
 
         if (user.isEmpty()) {
             userService.addUser(convertToUser(userDto), UserGroup.ADMIN);
+            LOGGER.info("Admin with email :{} was registered", userDto.getEmail());
 
             return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
         }
 
-        LOGGER.warn("User with email :{} already exist", userDto.getEmail());
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
@@ -117,7 +118,7 @@ public class UserController {
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = AuthenticationResponse.class))}),
             @ApiResponse(responseCode = "400", description = "not valid user"),
-            @ApiResponse(responseCode = "404", description = "user or password incorrect")
+            @ApiResponse(responseCode = "403", description = "user or password incorrect")
     })
     @PostMapping("/login")
     public AuthenticationResponse login(@Valid @RequestBody UserDto userDto) {
@@ -125,6 +126,8 @@ public class UserController {
         Optional<User> foundedUser = userService.getUserByEmail(userDto.getEmail());
 
         if (foundedUser.isPresent()) {
+            LOGGER.info("Logged user with email :{}", userDto.getEmail());
+
             return userService.getRegistrationResponse(foundedUser.get());
         }
 
