@@ -12,10 +12,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,18 +31,8 @@ class LinkControllerTest {
 
     @Test
     void shouldGetLinkByAlias() throws Exception {
-        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link("fullLink", "alias")));
-
+        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(new Link("fullLink", "alias"));
         this.mockMvc.perform(get("/api/links/{alias}", "alias")).andExpect(status().isOk());
-
-        verify(linkService).getUsersLinkByAlias(anyString());
-    }
-
-    @Test
-    void shouldNotGetLinkByNotFoundAlias() throws Exception {
-        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.empty());
-
-        this.mockMvc.perform(get("/api/links/{alias}", "alias")).andExpect(status().isNotFound());
 
         verify(linkService).getUsersLinkByAlias(anyString());
     }
@@ -59,7 +47,7 @@ class LinkControllerTest {
 
     @Test
     void shouldNotGetAllLinksToAnonymous() throws Exception {
-        this.mockMvc.perform(get("/api/links")).andExpect(status().is3xxRedirection());
+        this.mockMvc.perform(get("/api/links")).andExpect(status().isForbidden());
 
         verify(linkService, never()).getAllLinks();
     }
@@ -74,17 +62,6 @@ class LinkControllerTest {
     }
 
     @Test
-    void shouldNotAddLinkWhenThisAliasAlreadyExist() throws Exception {
-        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link()));
-
-        this.mockMvc.perform(post("/api/links")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"alias\":  \"linkShortener.com/youtube\"}")).andExpect(status().isConflict());
-
-        verify(linkService, never()).addLink(any(Link.class));
-    }
-
-    @Test
     void shouldNotAddInvalidLink() throws Exception {
         this.mockMvc.perform(post("/api/links")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -94,50 +71,34 @@ class LinkControllerTest {
     }
 
     @Test
+    void shouldAddView() throws Exception {
+        this.mockMvc.perform(put("/api/links/{alias}/view", "alias"))
+                .andExpect(status().isOk());
+
+        verify(linkService).addLinkView(anyString());
+    }
+    @Test
     void shouldUpdateLink() throws Exception {
-        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link()));
         this.mockMvc.perform(put("/api/links/{alias}", "alias")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"alias\":  \"alias\"}")).andExpect(status().isOk());
 
-        verify(linkService).updateLink(any(Link.class));
-    }
-
-    @Test
-    void shouldCreateNewAndDeletePreviousLinkWhenUpdatingWithNewAlias() throws Exception {
-        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link()));
-        this.mockMvc.perform(put("/api/links/{alias}", "alias")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"fullLink\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\", \"alias\":  \"not the same alias\"}")).andExpect(status().isOk());
-
-        verify(linkService, never()).updateLink(any(Link.class));
-        verify(linkService).removeLink(anyLong());
-        verify(linkService).addLink(any(Link.class));
+        verify(linkService).updateLink(new Link(), "alias");
     }
 
     @Test
     @WithMockUser
     void shouldRemoveLink() throws Exception {
-        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.of(new Link()));
         this.mockMvc.perform(delete("/api/links/{alias}", "alias")).andExpect(status().isOk());
 
-        verify(linkService).removeLink(anyLong());
-    }
-
-    @Test
-    @WithMockUser
-    void shouldNotRemoveLinkWhenNotFound() throws Exception {
-        when(linkService.getUsersLinkByAlias(anyString())).thenReturn(Optional.empty());
-        this.mockMvc.perform(delete("/api/links/{alias}", "alias")).andExpect(status().isNotFound());
-
-        verify(linkService, never()).removeLink(anyLong());
+        verify(linkService).removeLink(anyString());
     }
 
     @Test
     void shouldNotRemoveLinkToAnonymous() throws Exception {
-        this.mockMvc.perform(delete("/api/links/{id}", 1L)).andExpect(status().is3xxRedirection());
+        this.mockMvc.perform(delete("/api/links/{alias}", "alias")).andExpect(status().isForbidden());
 
-        verify(linkService, never()).removeLink(anyLong());
+        verify(linkService, never()).removeLink(anyString());
     }
 
     @Test
@@ -150,7 +111,7 @@ class LinkControllerTest {
 
     @Test
     void shouldNotRemoveAllLinksToAnonymous() throws Exception {
-        this.mockMvc.perform(delete("/api/links")).andExpect(status().is3xxRedirection());
+        this.mockMvc.perform(delete("/api/links")).andExpect(status().isForbidden());
 
         verify(linkService, never()).removeAllLinks();
     }

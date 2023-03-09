@@ -4,6 +4,8 @@ import com.linkshortener.dao.LinkDao;
 import com.linkshortener.dao.UserDao;
 import com.linkshortener.entity.Link;
 import com.linkshortener.entity.User;
+import com.linkshortener.exception.LinkAlreadyExistException;
+import com.linkshortener.exception.LinkNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -40,65 +42,43 @@ public class LinkService {
 
     /**
      * Returns link by id if found, if not found in current user than returns
-     * empty optional. If username not found throw UsernameNotFoundException.
+     * empty optional.
      *
      * @param id the id of link to return
      * @return optional of link, if not found - empty
      */
     public Optional<Link> getLinkById(long id) {
-        Optional<Link> optionalLink = linkDao.get(id);
-        Optional<User> optionalUser = getUserFromAuthContext();
+        Optional<Link> link = linkDao.get(id);
+        Optional<User> user = getUserFromAuthContext();
 
-        if (isUsersLink(optionalUser, optionalLink)) {
-            return optionalLink;
+        if (isUsersLink(user, link)) {
+            return link;
         }
 
         return Optional.empty();
     }
 
-    /**
-     * Returns link by alias if found, if not found user than returns empty
-     * optional. If username not found throw UsernameNotFoundException.
-     *
-     * @param alias the id of link to return
-     * @return optional of link, if not found - empty
-     */
-    public Optional<Link> getLinkByAlias(String alias) {
-        Optional<Link> optionalLink = linkDao.getLinkByAlias(alias);
-        Optional<User> optionalUser = getUserFromAuthContext();
-
-        if (isUsersLink(optionalUser, optionalLink)) {
-            return optionalLink;
-        }
-
-        return Optional.empty();
-    }
-
-    //TODO Add tests
     /**
      * Returns link by alias if found, if not found in current user than returns
-     * empty optional. If username not found throw UsernameNotFoundException.
+     * empty optional.
      *
      * @param alias the id of link to return
      * @return optional of link, if not found - empty
+     * @throws LinkNotFoundException if link with this alias was not found
      */
-    public Optional<Link> getUsersLinkByAlias(String alias) {
-        Optional<User> optionalUser = getUserFromAuthContext();
+    public Link getUsersLinkByAlias(String alias) {
+        Optional<Link> link = getUsersLink(alias);
 
-        if (optionalUser.isPresent()) {
-            Optional<Link> optionalLink = linkDao.getUsersLinkByAlias(alias, optionalUser.get().getId());
-
-            if (optionalLink.isPresent()) {
-                return optionalLink;
-            }
+        if (link.isPresent()) {
+            return link.get();
         }
 
-        return Optional.empty();
+        throw new LinkNotFoundException(alias);
     }
 
     /**
-     * Returns all links of current user. If user is not authenticated, nothing
-     * happens. If username not found throw UsernameNotFoundException.
+     * Returns all links of current user. If user is not authenticated, returns
+     * empty array.
      *
      * @return all link of current user
      */
@@ -120,65 +100,103 @@ public class LinkService {
 
     /**
      * Adds link, sets user to current user. If user not authenticated, link
-     * adds to anonymousUser. If username not found throw UsernameNotFoundException.
+     * adds to anonymousUser.
      *
      * @param link the link to add to current user
+     * @throws LinkAlreadyExistException if link with this alias already exist
      */
     @Transactional
     public void addLink(Link link) {
-        Optional<User> optionalUser = getUserFromAuthContext();
+        Optional<User> user = getUserFromAuthContext();
 
-        if (optionalUser.isPresent()) {
-            link.setUser(optionalUser.get());
+        if (user.isPresent() && getUsersLink(link.getAlias()).isEmpty()) {
+            link.setUser(user.get());
             linkDao.save(link);
-            LOGGER.info("Saved link :{} to user with username :{}", link, link.getUser().getEmail());
+            return;
         }
+
+        throw new LinkAlreadyExistException(link.getAlias());
     }
 
     /**
-     * Updates link, sets fullLink to new. If username not found throw
-     * UsernameNotFoundException.
+     * Adds link view.
+     *
+     * @param alias the alias of link to add view
+     * @throws LinkNotFoundException if link with this alias not found
+     */
+    @Transactional
+    public void addLinkView(String alias) {
+        if (getUsersLink(alias).isPresent()) {
+            Link link = getUsersLink(alias).get();
+            link.setViews(link.getViews() + 1);
+            return;
+        }
+
+        throw new LinkNotFoundException(alias);
+    }
+
+    /**
+     * Updates link, sets fullLink to new. If given different alias, creates
+     * new link and deletes previous.
      *
      * @param link the link to update to current user
+     * @throws LinkAlreadyExistException if link with this alias already exist
+     * @throws LinkNotFoundException     if link with this alias was not found
      */
     @Transactional
-    public void updateLink(Link link) {
-        Optional<User> optionalUser = getUserFromAuthContext();
-        Optional<Link> updatedLink = getUsersLinkByAlias(link.getAlias());
+    public void updateLink(Link link, String alias) {
+        Optional<User> user = getUserFromAuthContext();
 
-        if (isUsersLink(optionalUser, updatedLink)) {
-            updatedLink.orElseThrow().setFullLink(link.getFullLink());
-            linkDao.update(updatedLink.get());
-            LOGGER.info("Update link :{} to user with username :{}", link, link.getUser().getEmail());
+        if (user.isPresent() && getUsersLink(alias).isPresent()) {
+            if (alias.equals(link.getAlias())) {
+                Link foundedLink = getUsersLink(alias).get();
+                foundedLink.setFullLink(link.getFullLink());
+                linkDao.update(foundedLink);
+                return;
+            } else {
+                if (getUsersLink(link.getAlias()).isEmpty()) {
+                    linkDao.delete(getUsersLink(alias).get());
+                    link.setUser(user.get());
+                    linkDao.save(link);
+                    return;
+                }
+
+                throw new LinkAlreadyExistException(link.getAlias());
+            }
         }
+
+        throw new LinkNotFoundException(link.getAlias());
     }
 
     /**
-     * Removes link by id, if link found in current user. If user not
-     * authenticated, nothing happens. If username not found throw UsernameNotFoundException.
+     * Removes link by alias, if link found in current user. If user not
+     * authenticated, nothing happens.
      *
-     * @param id the id of link to remove
+     * @param alias the alias of link to remove
+     * @throws LinkNotFoundException if link with this alias was not found
      */
     @Transactional
-    public void removeLink(long id) {
-        Optional<User> optionalUser = getUserFromAuthContext();
-        Optional<Link> optionalLink = getLinkById(id);
+    public void removeLink(String alias) {
+        Optional<Link> link = getUsersLink(alias);
 
-        if (isUsersLink(optionalUser, optionalLink)) {
-            linkDao.get(id).ifPresent(linkDao::delete);
+        if (link.isPresent()) {
+            linkDao.delete(link.get());
+            return;
         }
+
+        throw new LinkNotFoundException(alias);
     }
 
     /**
      * Removes all his links, if user is authenticated . If user not authenticated, nothing
-     * happens. If username not found throw UsernameNotFoundException.
+     * happens.
      */
     @Transactional
     public void removeAllLinks() {
-        Optional<User> optionalUser = getUserFromAuthContext();
+        Optional<User> user = getUserFromAuthContext();
 
-        if (optionalUser.isPresent() && !optionalUser.get().getEmail().equals("anonymousUser")) {
-            linkDao.deleteAllByUserId(optionalUser.get().getId());
+        if (user.isPresent() && !user.get().getEmail().equals("anonymousUser")) {
+            linkDao.deleteAllByUserId(user.get().getId());
         }
     }
 
@@ -201,5 +219,15 @@ public class LinkService {
         return link.isPresent()
                 && user.isPresent()
                 && Objects.equals(link.get().getUser().getId(), user.get().getId());
+    }
+
+    private Optional<Link> getUsersLink(String alias) {
+        Optional<User> user = getUserFromAuthContext();
+
+        if (user.isPresent() && linkDao.getUsersLinkByAlias(alias, user.get().getId()).isPresent()) {
+            return linkDao.getUsersLinkByAlias(alias, user.get().getId());
+        }
+
+        return Optional.empty();
     }
 }

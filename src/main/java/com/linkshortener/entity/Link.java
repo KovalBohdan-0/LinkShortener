@@ -2,6 +2,7 @@ package com.linkshortener.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -17,16 +18,25 @@ public class Link {
     @Basic
     @Column(name = "alias")
     private String alias;
+    @Basic
+    @Column(name = "views")
+    private Long views;
+    @Basic
+    @Column(name = "date")
+    private LocalDateTime date;
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     public Link() {
-
+        this.date = LocalDateTime.now();
+        this.views = 0L;
     }
 
     public Link(String fullLink, String alias) {
         this.fullLink = fullLink;
         this.alias = alias;
+        this.date = LocalDateTime.now();
+        this.views = 0L;
     }
 
     public User getUser() {
@@ -61,6 +71,22 @@ public class Link {
         this.id = id;
     }
 
+    public Long getViews() {
+        return views;
+    }
+
+    public void setViews(Long views) {
+        this.views = views;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -79,6 +105,8 @@ public class Link {
         return "Link{" +
                 "fullLink='" + fullLink + '\'' +
                 ", alias='" + alias + '\'' +
+                ", date='" + date + '\'' +
+                ", views='" + views + '\'' +
                 ", id=" + id +
                 '}';
     }

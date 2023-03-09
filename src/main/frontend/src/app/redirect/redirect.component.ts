@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -18,6 +18,7 @@ export class RedirectComponent {
   }
 
   getLink(alias: string) {
+    this.linkService.addLinkView(alias).subscribe();
     this.linkService.getLink(alias).subscribe({
       next: (response: any) => {
         window.location.href = response.body.fullLink;
