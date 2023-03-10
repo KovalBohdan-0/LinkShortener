@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class LinkApiExceptionHandler {
+public class ApiExceptionHandler {
     @ExceptionHandler(LinkNotFoundException.class)
     public ResponseEntity<Object> handleLinkNotFoundException() {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -30,7 +30,7 @@ public class LinkApiExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(UserAlreadyExistException.class)
+    @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Object> handleUserNotFoundException() {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
@@ -39,7 +39,7 @@ public class LinkApiExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler(UserAlreadyExistException.class)
     public ResponseEntity<Object> handleUserAlreadyExistException() {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());

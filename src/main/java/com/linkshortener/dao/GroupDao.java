@@ -5,8 +5,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
@@ -23,7 +21,6 @@ import java.util.Set;
  */
 @Repository
 public class GroupDao implements Dao<Group> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GroupDao.class);
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -48,8 +45,6 @@ public class GroupDao implements Dao<Group> {
         List<Group> groupList = query.getResultList();
 
         if (groupList.size() == 0) {
-            LOGGER.info("Group with code :{} was not found", code);
-
             return Optional.empty();
         }
 
@@ -71,10 +66,8 @@ public class GroupDao implements Dao<Group> {
     @SuppressWarnings("unchecked")
     public Set<Group> getGroupsByUserId(long id) {
         Query query = entityManager.createQuery("SELECT role FROM roles role JOIN FETCH role.users user WHERE user.id =: user_id", Group.class).setParameter("user_id", id);
-        Set<Group> userGroups = new HashSet<Group>(query.getResultList());
-        LOGGER.info("Founded user with user groups :{}", userGroups);
 
-        return userGroups;
+        return new HashSet<Group>(query.getResultList());
     }
 
     @Override
