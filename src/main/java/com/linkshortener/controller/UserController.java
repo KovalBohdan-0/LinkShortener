@@ -13,16 +13,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -43,12 +37,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
     private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
-    public UserController(UserService userService, AuthenticationManager authenticationManager) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.authenticationManager = authenticationManager;
     }
 
     @Operation(summary = "Returns all users",
@@ -65,7 +57,7 @@ public class UserController {
     }
 
     @Operation(summary = "Creates user",
-    description = "Creates user with USER authorities, fails if email is already used.")
+            description = "Creates user with USER authorities, fails if email is already used.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "user added",
                     content = {@Content(mediaType = "application/json",
@@ -74,21 +66,13 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "email already exist")
     })
     @PostMapping("/users")
-    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody UserDto userDto) {
-        Optional<User> user = userService.getUserByEmail(userDto.getEmail());
-
-        if (user.isEmpty()) {
-            userService.addUser(convertToUser(userDto), UserGroup.USER);
-            LOGGER.info("User with email :{} was registered", userDto.getEmail());
-
-            return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+    public void register(@Valid @RequestBody UserDto userDto) {
+        userService.addUser(convertToUser(userDto), UserGroup.USER);
+        LOGGER.info("User with email :{} was registered", userDto.getEmail());
     }
 
-    @Operation(summary = "Creates user" ,
-    description = "Creates user with ADMIN authorities, fails if email is already used and user doesn't have ADMIN authorities.")
+    @Operation(summary = "Creates user",
+            description = "Creates user with ADMIN authorities, fails if email is already used and user doesn't have ADMIN authorities.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "user added",
                     content = {@Content(mediaType = "application/json",
@@ -98,21 +82,13 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "email already exist")
     })
     @PostMapping("/users/admin")
-    public ResponseEntity<AuthenticationResponse> registerAdmin(@Valid @RequestBody UserDto userDto) {
-        Optional<User> user = userService.getUserByEmail(userDto.getEmail());
-
-        if (user.isEmpty()) {
-            userService.addUser(convertToUser(userDto), UserGroup.ADMIN);
-            LOGGER.info("Admin with email :{} was registered", userDto.getEmail());
-
-            return new ResponseEntity<>(userService.getRegistrationResponse(convertToUser(userDto)), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+    public void registerAdmin(@Valid @RequestBody UserDto userDto) {
+        userService.addUser(convertToUser(userDto), UserGroup.ADMIN);
+        LOGGER.info("Admin with email :{} was registered", userDto.getEmail());
     }
 
     @Operation(summary = "Logins user",
-    description = "Logins and returns jwt token for authorization")
+            description = "Logins and returns jwt token for authorization")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "login was successful",
                     content = {@Content(mediaType = "application/json",
@@ -122,20 +98,11 @@ public class UserController {
     })
     @PostMapping("/login")
     public AuthenticationResponse login(@Valid @RequestBody UserDto userDto) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
-        Optional<User> foundedUser = userService.getUserByEmail(userDto.getEmail());
-
-        if (foundedUser.isPresent()) {
-            LOGGER.info("Logged user with email :{}", userDto.getEmail());
-
-            return userService.getRegistrationResponse(foundedUser.get());
-        }
-
-        throw new UsernameNotFoundException("User not found, email :" + userDto.getEmail());
+        return userService.getRegistrationResponse(convertToUser(userDto));
     }
 
     @Operation(summary = "Delete all users",
-    description = "Delete all users if signed as admin")
+            description = "Delete all users if signed as admin")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "removed all users"),
             @ApiResponse(responseCode = "403", description = "forbidden for user without ADMIN authority")

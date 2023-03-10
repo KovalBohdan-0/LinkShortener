@@ -5,17 +5,26 @@ import com.linkshortener.dao.UserDao;
 import com.linkshortener.entity.Group;
 import com.linkshortener.entity.User;
 import com.linkshortener.enums.UserGroup;
+import com.linkshortener.exception.UserAlreadyExistException;
+import com.linkshortener.exception.UserNotFoundException;
 import com.linkshortener.security.AuthenticationResponse;
 import com.linkshortener.security.CustomUserDetails;
 import com.linkshortener.security.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * This class consist of methods that make business logic of creation,
@@ -35,13 +44,15 @@ public class UserService {
     private final UserDao userDao;
     private final GroupDao groupDao;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserDao userDao, GroupDao groupDao, JwtService jwtService, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserDao userDao, GroupDao groupDao, JwtService jwtService, BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
         this.userDao = userDao;
         this.groupDao = groupDao;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
     /**
@@ -74,14 +85,20 @@ public class UserService {
      *
      * @param user      the user to add
      * @param userGroup authorities that user will have USER or ADMIN
+     * @throws UserAlreadyExistException if user with this email already exist
      */
     @Transactional
     public void addUser(User user, UserGroup userGroup) {
-        if (userDao.getByUsername(user.getEmail()).isEmpty()) {
+        Optional<User> foundedUser = userDao.getByUsername(user.getEmail());
+
+        if (foundedUser.isEmpty()) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             addGroupToUser(user, userGroup);
             userDao.save(user);
+            return;
         }
+
+        throw new UserAlreadyExistException(user.getEmail());
     }
 
     /**
@@ -109,10 +126,20 @@ public class UserService {
      *
      * @param user logged or registered user
      * @return jwt token to make authorized requests
+     * @throws UserNotFoundException if not found user with this email and password
      */
     public AuthenticationResponse getRegistrationResponse(User user) {
+        String jwt;
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+        } catch (AuthenticationException e) {
+            throw new UserNotFoundException(user.getEmail());
+        }
+
         UserDetails userDetails = new CustomUserDetails(user.getEmail(), user.getPassword());
-        String jwt = jwtService.generateJwt(new HashMap<>(), userDetails);
+        jwt = jwtService.generateJwt(new HashMap<>(), userDetails);
 
         return new AuthenticationResponse(jwt);
     }
