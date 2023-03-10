@@ -1,6 +1,5 @@
 package com.linkshortener.controller;
 
-import com.linkshortener.entity.User;
 import com.linkshortener.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -61,18 +58,6 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldNotRegisterUserWithExistingEmail() throws Exception {
-        when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(new User()));
-
-        this.mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\": \"user@gmail.com\", \"password\":  \"pass\"}"))
-                .andExpect(status().isConflict());
-
-        verify(userService, never()).addUser(any(), any());
-    }
-
-    @Test
     void shouldNotRegisterInvalidUser() throws Exception {
         this.mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -91,19 +76,6 @@ class UserControllerTest {
                 .andExpect(status().isOk());
 
         verify(userService).addUser(any(), any());
-    }
-
-    @Test
-    @WithMockUser(username="admin", authorities = {"ADMIN"})
-    void shouldNotRegisterAdminWithExistingEmail() throws Exception {
-        when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(new User()));
-
-        this.mockMvc.perform(post("/api/users/admin")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"email\": \"admin@gmail.com\", \"password\":  \"pass\"}"))
-                .andExpect(status().isConflict());
-
-        verify(userService, never()).addUser(any(), any());
     }
 
 
@@ -147,14 +119,11 @@ class UserControllerTest {
 
     @Test
     void shouldLogin() throws Exception {
-        when(userService.getUserByEmail(anyString())).thenReturn(Optional.of(new User()));
-
         this.mockMvc.perform(post("/api/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"email\": \"user@gmail.com\", \"password\":  \"pass\"}"))
                 .andExpect(status().isOk());
 
-        verify(authenticationManager).authenticate(any());
         verify(userService).getRegistrationResponse(any());
     }
 

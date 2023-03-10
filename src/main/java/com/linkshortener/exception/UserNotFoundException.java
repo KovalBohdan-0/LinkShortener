@@ -1,7 +1,7 @@
 package com.linkshortener.exception;
 
 public class UserNotFoundException extends RuntimeException {
-    public UserNotFoundException() {
-        super("User with this email and password was not found");
+    public UserNotFoundException(String email) {
+        super(String.format("User with email %s and password not found", email));
     }
 }
