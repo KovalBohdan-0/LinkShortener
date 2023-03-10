@@ -83,7 +83,7 @@ class UserServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     void shouldGetRegistrationResponse() {
-        userService.getRegistrationResponse(new User());
+        userService.getAuthenticationResponse(new User());
 
         verify(jwtService).generateJwt(any(Map.class), any(UserDetails.class));
     }

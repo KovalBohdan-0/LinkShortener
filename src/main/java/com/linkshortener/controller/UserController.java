@@ -11,8 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,8 +35,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
-    private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
-
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -66,9 +62,8 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "email already exist")
     })
     @PostMapping("/users")
-    public void register(@Valid @RequestBody UserDto userDto) {
-        userService.addUser(convertToUser(userDto), UserGroup.USER);
-        LOGGER.info("User with email :{} was registered", userDto.getEmail());
+    public AuthenticationResponse register(@Valid @RequestBody UserDto userDto) {
+        return userService.addUser(convertToUser(userDto), UserGroup.USER);
     }
 
     @Operation(summary = "Creates user",
@@ -82,9 +77,8 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "email already exist")
     })
     @PostMapping("/users/admin")
-    public void registerAdmin(@Valid @RequestBody UserDto userDto) {
-        userService.addUser(convertToUser(userDto), UserGroup.ADMIN);
-        LOGGER.info("Admin with email :{} was registered", userDto.getEmail());
+    public AuthenticationResponse registerAdmin(@Valid @RequestBody UserDto userDto) {
+        return userService.addUser(convertToUser(userDto), UserGroup.ADMIN);
     }
 
     @Operation(summary = "Logins user",
@@ -98,7 +92,7 @@ public class UserController {
     })
     @PostMapping("/login")
     public AuthenticationResponse login(@Valid @RequestBody UserDto userDto) {
-        return userService.getRegistrationResponse(convertToUser(userDto));
+        return userService.getAuthenticationResponse(convertToUser(userDto));
     }
 
     @Operation(summary = "Delete all users",

@@ -21,7 +21,7 @@ import java.util.Set;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-    private final static Logger LOGGER = LoggerFactory.getLogger(UserDao.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(CustomUserDetailsService.class);
     private final UserDao userDao;
     private final GroupDao groupDao;
 
@@ -34,7 +34,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (userDao.getByUsername(username).isPresent()) {
             User user = userDao.getByUsername(username).get();
-            LOGGER.info("Loaded user with email: {} and Authorities :{}", user.getEmail(), getAuthorities(user));
 
             return new CustomUserDetails(username, user.getPassword(), new HashSet<>(getAuthorities(user)));
         }

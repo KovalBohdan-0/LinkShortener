@@ -85,17 +85,21 @@ public class UserService {
      *
      * @param user      the user to add
      * @param userGroup authorities that user will have USER or ADMIN
+     * @return jwt token to make authorized requests
      * @throws UserAlreadyExistException if user with this email already exist
      */
     @Transactional
-    public void addUser(User user, UserGroup userGroup) {
+    public AuthenticationResponse addUser(User user, UserGroup userGroup) {
         Optional<User> foundedUser = userDao.getByUsername(user.getEmail());
 
         if (foundedUser.isEmpty()) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             addGroupToUser(user, userGroup);
             userDao.save(user);
-            return;
+            UserDetails userDetails = new CustomUserDetails(user.getEmail(), user.getPassword());
+            String jwt = jwtService.generateJwt(new HashMap<>(), userDetails);
+
+            return new AuthenticationResponse(jwt);
         }
 
         throw new UserAlreadyExistException(user.getEmail());
@@ -128,7 +132,7 @@ public class UserService {
      * @return jwt token to make authorized requests
      * @throws UserNotFoundException if not found user with this email and password
      */
-    public AuthenticationResponse getRegistrationResponse(User user) {
+    public AuthenticationResponse getAuthenticationResponse(User user) {
         String jwt;
 
         try {

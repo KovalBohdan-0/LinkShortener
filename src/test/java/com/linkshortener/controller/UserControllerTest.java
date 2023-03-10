@@ -124,7 +124,7 @@ class UserControllerTest {
                         .content("{\"email\": \"user@gmail.com\", \"password\":  \"pass\"}"))
                 .andExpect(status().isOk());
 
-        verify(userService).getRegistrationResponse(any());
+        verify(userService).getAuthenticationResponse(any());
     }
 
     @Test
@@ -135,6 +135,6 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(authenticationManager, never()).authenticate(any());
-        verify(userService, never()).getRegistrationResponse(any());
+        verify(userService, never()).getAuthenticationResponse(any());
     }
 }

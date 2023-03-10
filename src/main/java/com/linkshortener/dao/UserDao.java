@@ -5,8 +5,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,7 +21,6 @@ import java.util.Optional;
 public class UserDao implements Dao<User>{
     @PersistenceContext
     private EntityManager entityManager;
-    private final Logger LOGGER = LoggerFactory.getLogger(UserDao.class);
 
     public UserDao() {
 
@@ -46,8 +43,6 @@ public class UserDao implements Dao<User>{
         List<User> list = query.getResultList();
 
         if (list.size() == 0) {
-            LOGGER.warn("User with email :{} was not found", username);
-
             return Optional.empty();
         }
 
