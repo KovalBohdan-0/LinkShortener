@@ -20,12 +20,7 @@ export class MyurlComponent {
   }
 
   copyToClipboard(link: any): void {
-    document.addEventListener('copy', (e: ClipboardEvent) => {
-      e.clipboardData.setData('text/plain', ("http://localhost:4200/l/" + link.alias));
-      e.preventDefault();
-      document.removeEventListener('copy', null);
-    });
-    document.execCommand('copy');
+    this.linkService.copyToClipboard(link);
   }
 
   deleteLink(link) {
@@ -45,24 +40,23 @@ export class MyurlComponent {
   }
 
   getFavicon(link: any): string {
-    // return "https://s2.googleusercontent.com/s2/favicons?domain_url=" + link.fullLink;
-    return "";
+    return "https://s2.googleusercontent.com/s2/favicons?domain_url=" + link.fullLink;
   }
 
   openModal(content) {
-		this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then(
-			(result) => {
-				this.updateResult = result;
-			},
-			(reason) => {
-			},
-		);
-	}
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then(
+      (result) => {
+        this.updateResult = result;
+      },
+      (reason) => {
+      },
+    );
+  }
 
   updateLink(link) {
     let newLink = link.value;
 
-    if(newLink.alias == "") {
+    if (newLink.alias == "") {
       newLink.alias = this.link.alias;
     } else if (newLink.fullLink == "") {
       newLink.fullLink = this.link.fullLink;

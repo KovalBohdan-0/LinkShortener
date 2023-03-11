@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 import { LinkService } from '../link.service';
 import { ToastService } from '../toast.service';
 
@@ -15,8 +17,13 @@ export class MyurlsComponent {
   pageSize = 4;
   collectionSize = this.links.length;
 
-  constructor(private linkService: LinkService, public toastService: ToastService) {
-    this.getLinks();
+  constructor(private linkService: LinkService, public toastService: ToastService, private authService: AuthService, private router: Router) {
+    if (authService.getToken() != null) {
+      this.getLinks();
+    } else {
+      toastService.addError("My usrls", "First login into account");
+      this.router.navigate(['/app-login']);
+    }
   }
 
   getLinks() {
@@ -25,10 +32,25 @@ export class MyurlsComponent {
         this.links = response.body;
         this.updateLinks();
       },
-      error: (error) => {
-        console.log(error);
+      error: (error) => {}
+    });
+  }
+
+  deleteAllLinks() {
+    this.linkService.deleteAllLinks().subscribe({
+      next: (response: any) => {
+        this.toastService.addSuccess("Deleting all links", "Links were successfully deleted");
+        this.refreshLinks();
+      },
+      error: (error: any) => {
+        this.toastService.addError("Deleting all links", "Something went wrong");
       }
     });
+  }
+
+  refreshLinks() {
+    this.getLinks();
+    this.updateLinks();
   }
 
   updateLinks() {

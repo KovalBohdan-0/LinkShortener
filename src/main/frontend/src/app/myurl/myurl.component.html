@@ -1,20 +1,24 @@
 <div class="myurl p-4 bg-primary rounded-4 m-1 text-white d-flex flex-column">
     <div>
         <img src="{{getFavicon(link)}}" alt="">
-        <a href="{{link.fullLink}}" class="text-white">{{(link.fullLink.length>40)? (link.fullLink |
+        <a target="_blank" href="{{link.fullLink}}" class="text-white">{{(link.fullLink.length>40)? (link.fullLink |
             slice:0:40)+'...':(link.fullLink)}}</a>
         <div class="">
-            <a href="http://localhost:4200/l/{{link.alias}}" class="text-white">localhost:4200/l/{{link.alias}}</a>
+            <a target="_blank" href="http://localhost:4200/l/{{link.alias}}" class="text-white">localhost:4200/l/{{link.alias}}</a>
         </div>
     </div>
-    <div class="ms-auto d-flex flex-column">
-        <span>Views: {{link.views}}</span>
-        <span>Date: {{link.date | date: 'shortDate'}}</span>
+    <div class="information ms-auto d-flex flex-column">
+        <span><i class="bi bi-eye-fill"></i> Views: {{link.views}}</span>
+        <span><i class="bi bi-calendar-date-fill"></i> Date: {{link.date | date: 'hh:mm dd/MM/YY'}}</span>
         <div>
             <button class="btn btn-light url-button" [disabled]="" (click)="openModal(content)">Change</button>
             <button class="btn btn-secondary bg-gradient url-button" (click)="copyToClipboard(link)"
-                ngbPopover="Link copied: localhost:4200/l/{{link.alias}}">Copy</button>
-            <button class="btn btn-danger bg-gradient url-button" (click)="deleteLink(link)">Delete</button>
+                ngbPopover="Link copied: localhost:4200/l/{{link.alias}}">
+                <i class="bi bi-clipboard2-fill"></i>
+                Copy</button>
+            <button class="btn btn-danger bg-gradient url-button" (click)="deleteLink(link)">
+                <i class="bi bi-trash-fill"></i>
+                Delete</button>
         </div>
     </div>
 </div>

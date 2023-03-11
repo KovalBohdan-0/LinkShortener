@@ -13,3 +13,11 @@ a {
     border-radius: 0.3rem;
     font-weight: 500;
 }
+
+
+@media screen and (max-width: 600px) {
+    .information {
+        margin-left: 0 !important;
+        padding-top: 1rem;
+    }    
+}
