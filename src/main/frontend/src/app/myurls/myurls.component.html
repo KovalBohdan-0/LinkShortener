@@ -1,4 +1,8 @@
+<button class="refresh btn text-white fw-bold" (click)="refreshLinks()"><i class="bi bi-arrow-clockwise"></i>Refresh</button>
+
 <div class="myurls w-50 mx-auto">
+	<button class="btn text-danger d-flex ms-auto fw-bold" (click)="deleteAllLinks()"><i class="bi bi-x-circle-fill"></i>Delete all</button>
+
     <div *ngFor="let link of currentLinks">
         <app-myurl [currentLinks]="currentLinks" [link]="link"></app-myurl>
     </div>

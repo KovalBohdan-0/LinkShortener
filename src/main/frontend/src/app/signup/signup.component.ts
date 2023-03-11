@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { ToastService } from '../toast.service';
 import User from '../user';
 
 @Component({
@@ -17,7 +18,7 @@ export class SignupComponent {
   confirmPassword!: string;
   message!: string;
 
-  constructor(private router: Router, private authService: AuthService) { }
+  constructor(private router: Router, private authService: AuthService, private toastService: ToastService) { }
 
   signUp(userForm: NgForm): void {
     this.user.email = userForm.value.email;
@@ -25,15 +26,16 @@ export class SignupComponent {
 
     this.authService.signUp(this.user).subscribe({
       next: (response: any) => {
+        console.log(response);
         this.authService.storeToken(response.body.jwt);
-        this.router.navigate(['/app-shortener'])
+        this.toastService.addSuccess("Creating user", "Successfully created user");
+        this.router.navigate(['/app-shortener']);
       },
       error: (error) => {
         if (error.status == 409) {
-          this.message = "Email is already exist !";
+          this.toastService.addError("Creating user", "User with email: " + this.user.email + " already exist");
         } else {
-          this.message = "Something went wrong !";
-        }
+          this.toastService.addError("Creating user", "Something went wrong !");        }
       }
     });
   }

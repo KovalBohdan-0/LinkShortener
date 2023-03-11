@@ -3,7 +3,7 @@
         <li><a class="nav-link" routerLink="/app-shortener" routerLinkActive="active" ariaCurrentWhenActive="page">Home</a></li>
         <li><a class="nav-link" routerLink="/app-myurls" routerLinkActive="active" ariaCurrentWhenActive="page">My urls</a></li>
         <div *ngIf="getToken() == null; else logined" class="d-flex">
-            <li><a class="nav-link" routerLink="/app-login" routerLinkActive="active" ariaCurrentWhenActive="page">Log in</a></li>
+            <li><a class="nav-link" routerLink="/app-login" routerLinkActive="active" ariaCurrentWhenActive="page"><i class="bi bi-box-arrow-in-right"></i> Log in</a></li>
             <li><a class="nav-link" routerLink="/app-signup" routerLinkActive="active" ariaCurrentWhenActive="page">Sign up</a></li>
         </div>
         <ng-template #logined>

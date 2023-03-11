@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { AuthService } from '../auth.service';
 import { Link } from '../link';
 import { LinkService } from '../link.service';
 import { ToastService } from '../toast.service';
@@ -16,45 +17,68 @@ export class ShortenerComponent {
     fullLink: "",
     alias: ""
   }
+  isChecked = true;
   message!: string;
   successMessage!: string;
 
-  constructor(private linkService: LinkService, public toastService: ToastService) { }
+  constructor(private linkService: LinkService, public toastService: ToastService, private authService: AuthService) { }
 
   shortLink(formLink: NgForm): void {
+    let aliasIsEmpty;
+
     if (formLink.value.alias == "") {
-      formLink.value.alias = this.setRandomAlias();
+      aliasIsEmpty = true;
+      formLink.value.alias = this.randomString(5);
     }
 
     this.link = formLink.value;
     this.linkService.addLink(formLink).subscribe({
       next: (response) => {
-        this.toastService.addSuccess("Creating short link", "Link was saved. Short link: localhost:4200/l/" + this.link.alias);
-        this.link.alias = "";
+        this.toastService.addSuccess("Creating short link", "Link was saved and copied. Short link: localhost:4200/l/" + this.link.alias);
+        this.linkService.copyToClipboard(this.link);
       },
       error: (error) => {
         if (error.status == 409) {
+          if (aliasIsEmpty) {
+            formLink.value.alias = "";
+            this.shortLink(formLink);
+          }
+
           this.toastService.addError("Creating short link", "Link with this alias already exist");
         } else {
           this.toastService.addError("Creating short link", "Something went wrong !");
         }
       }
     });
+
+    this.addLinkToGlobal(formLink);
+  }
+
+  addLinkToGlobal(formLink: NgForm) {
+    if (this.getToken() != null && this.isChecked == true) {
+      this.linkService.addLinkToGlobal(formLink).subscribe({
+        next: (response) => {
+          this.toastService.addSuccess("Creating global link", "Global link was saved and copied. Short link: localhost:4200/l/" + this.link.alias);
+
+          formLink.value.alias = "";
+        },
+        error: (error) => {
+          if (error.status == 409) {
+            this.toastService.addError("Creating global link", "Link with this alias already exist");
+          } else {
+            this.toastService.addError("Creating global link", "Something went wrong !");
+          }
+        }
+      });
+    }
   }
 
   randomString(length): string {
     return self.crypto.randomUUID().toString().substring(0, length);
   }
 
-  setRandomAlias() {
-    let randomAlias = this.randomString(5);
-    this.linkService.getLink(randomAlias).subscribe(response => {
-      if (response.body != null) {
-        this.setRandomAlias();
-      } 
-    });
-
-    return randomAlias;
+  getToken(): string {
+    return this.authService.getToken();
   }
 }
 

@@ -3,5 +3,11 @@
 }
 
 .myurls {
-    min-width: 19rem;
+    min-width: 24rem;
+}
+
+.refresh {
+    display: flex;
+    margin: 0 auto;
+    font-size: larger;
 }
