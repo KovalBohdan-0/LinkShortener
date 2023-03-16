@@ -5,5 +5,5 @@ RUN mvn clean package -DskipTests -P render
 
 #Run
 FROM openjdk:20-ea-17-jdk
-ADD /target/LinkShortener-0.0.1-SNAPSHOT.jar backend.jar
+COPY --from=build /target/LinkShortener-0.0.1-SNAPSHOT.jar backend.jar
 ENTRYPOINT ["java", "-jar", "backend.jar"]
