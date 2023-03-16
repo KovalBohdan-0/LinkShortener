@@ -1,5 +1,5 @@
 #Build
-FROM maven:3.9.0-ibm-semeru-17-focal AS build
+FROM maven:3.9.0-sapmachine-17 AS build
 COPY . .
 RUN mvn clean package -DskipTests -P render
 
