@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class LinkService {
+  // domain = "http://linkshortener.eu-north-1.elasticbeanstalk.com/api/links";
   domain = "http://localhost:8080/api/links";
   headers;
 
@@ -20,7 +21,7 @@ export class LinkService {
 
   getLinks(): Observable<HttpResponse<Object>> {
     this.updateToken();
-    
+
     if (this.authService.getToken() != null) {
       return this.http.get(this.domain, { headers: this.headers, observe: "response" });
     }
@@ -34,12 +35,12 @@ export class LinkService {
   }
 
   addLinkToGlobal(formLink: NgForm) {
-    return this.http.post(this.domain, formLink.value, { headers: {'Content-Type': 'application/json'}, observe: "response" });
+    return this.http.post(this.domain, formLink.value, { headers: { 'Content-Type': 'application/json' }, observe: "response" });
   }
 
   addLinkView(alias): Observable<HttpResponse<Object>> {
     this.updateToken();
-    return this.http.put(this.domain + "/" + alias + "/view",{} , { headers: this.headers, observe: "response" });
+    return this.http.put(this.domain + "/" + alias + "/view", {}, { headers: this.headers, observe: "response" });
   }
 
   updateLink(link, previousAlias) {
@@ -72,6 +73,10 @@ export class LinkService {
         'Content-Type': 'application/json',
         'Authorization': "Bearer " + this.authService.getToken()
       });
-    }  
+    } else {
+      this.headers = new HttpHeaders({
+        'Content-Type': 'application/json'
+      });
+    }
   }
 }
