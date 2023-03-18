@@ -6,6 +6,7 @@
     <div *ngFor="let link of currentLinks">
         <app-myurl [currentLinks]="currentLinks" [link]="link"></app-myurl>
     </div>
+	<button class="btn btn-lg bg-primary text-white d-flex mx-auto fw-bold" (click)="redirectToShortener()">Add link</button>
     
 <div class="d-flex justify-content-between p-2">
 	<ngb-pagination

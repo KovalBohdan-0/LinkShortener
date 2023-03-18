@@ -60,4 +60,8 @@ export class MyurlsComponent {
     );
     this.collectionSize = this.links.length;
   }
+
+  redirectToShortener() {
+    this.router.navigate(['/app-shortener'])
+  }
 }

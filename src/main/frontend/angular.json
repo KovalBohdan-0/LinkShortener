@@ -68,12 +68,12 @@
               ]
             },
             "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true,
+              "optimization": {
+                "scripts": true,
+                 "styles": true,
+                 "fonts": false
+             },
+             "outputHashing": "all",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -82,6 +82,12 @@
               ]
             },
             "render": {
+              "optimization": {
+                "scripts": true,
+                 "styles": true,
+                 "fonts": false
+             },
+             "outputHashing": "all",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.development.ts",
