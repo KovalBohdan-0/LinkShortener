@@ -26,7 +26,6 @@ export class SignupComponent {
 
     this.authService.signUp(this.user).subscribe({
       next: (response: any) => {
-        console.log(response);
         this.authService.storeToken(response.body.jwt);
         this.toastService.addSuccess("Creating user", "Successfully created user");
         this.router.navigate(['/app-shortener']);
@@ -40,3 +39,4 @@ export class SignupComponent {
     });
   }
 }
+
