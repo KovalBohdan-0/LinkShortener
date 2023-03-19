@@ -15,7 +15,7 @@ services:
     build:
       context: .
       args: 
-        enviroment: 'development'
+        env: 'development'
     container_name: 'java-app'
     ports:
       - "8080:8080"
@@ -28,7 +28,7 @@ services:
     build:
       context: ./src/main/frontend 
       args: 
-        enviroment: 'development'
+        env: 'development'
     container_name: 'frontend'
     ports:
       - "4200:80"
