@@ -8,6 +8,7 @@ RUN npm run build -- --configuration $env
 
 # Run
 FROM nginx:stable-alpine
-ARG env=render
-COPY default.$env.conf /etc/nginx/conf.d/default.conf
+COPY default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/local/app/dist/frontend /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
