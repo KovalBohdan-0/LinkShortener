@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { environment } from 'src/environments/environment.development';
 import { LinkService } from '../link.service';
-import { MyurlsComponent } from '../myurls/myurls.component';
 import { ToastService } from '../toast.service';
 
 @Component({
@@ -13,10 +13,11 @@ export class MyurlComponent {
   @Input() link;
   @Input("currentLinks") links: any;
   updateResult: string;
+  environment;
 
 
   constructor(private linkService: LinkService, private modalService: NgbModal, public toastService: ToastService) {
-
+    this.environment = environment;
   }
 
   copyToClipboard(link: any): void {
