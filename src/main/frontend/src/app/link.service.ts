@@ -60,7 +60,7 @@ export class LinkService {
 
   copyToClipboard(link: any): void {
     document.addEventListener('copy', (e: ClipboardEvent) => {
-      e.clipboardData.setData('text/plain', (environment.host + "l/" + link.alias));
+      e.clipboardData.setData('text/plain', (environment.host + "/l/" + link.alias));
       e.preventDefault();
       document.removeEventListener('copy', null);
     });
