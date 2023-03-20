@@ -4,7 +4,7 @@
         <a target="_blank" href="{{link.fullLink}}" class="text-white">{{(link.fullLink.length>40)? (link.fullLink |
             slice:0:40)+'...':(link.fullLink)}}</a>
         <div class="">
-            <a target="_blank" href="http://localhost:4200/l/{{link.alias}}" class="text-white">localhost:4200/l/{{link.alias}}</a>
+            <a target="_blank" href="http://{{environment.host}}/l/{{link.alias}}" class="text-white">{{environment.host}}/l/{{link.alias}}</a>
         </div>
     </div>
     <div class="information ms-auto d-flex flex-column">
@@ -13,7 +13,7 @@
         <div>
             <button class="btn btn-light url-button" [disabled]="" (click)="openModal(content)">Change</button>
             <button class="btn btn-secondary bg-gradient url-button" (click)="copyToClipboard(link)"
-                ngbPopover="Link copied: localhost:4200/l/{{link.alias}}">
+                ngbPopover="Link copied: {{environment.host}}/l/{{link.alias}}">
                 <i class="bi bi-clipboard2-fill"></i>
                 Copy</button>
             <button class="btn btn-danger bg-gradient url-button" (click)="deleteLink(link)">
