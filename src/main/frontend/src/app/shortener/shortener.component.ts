@@ -35,7 +35,7 @@ export class ShortenerComponent {
     this.link = formLink.value;
     this.linkService.addLink(formLink).subscribe({
       next: (response) => {
-        this.toastService.addSuccess("Creating short link", "Link was saved and copied. Short link:" + environment.host + "l/" + this.link.alias);
+        this.toastService.addSuccess("Creating short link", "Link was saved and copied. Short link:" + environment.domain + "l/" + this.link.alias);
         this.linkService.copyToClipboard(this.link);
       },
       error: (error) => {
@@ -59,7 +59,7 @@ export class ShortenerComponent {
     if (this.getToken() != null && this.isChecked == true) {
       this.linkService.addLinkToGlobal(formLink).subscribe({
         next: (response) => {
-          this.toastService.addSuccess("Creating global link", "Global link was saved and copied. Short link:" + environment.host + "l/" + this.link.alias);
+          this.toastService.addSuccess("Creating global link", "Global link was saved and copied. Short link:" + environment.domain + "l/" + this.link.alias);
 
           formLink.value.alias = "";
         },
