@@ -8,6 +8,9 @@ import com.linkshortener.exception.LinkAlreadyExistException;
 import com.linkshortener.exception.LinkNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -96,6 +99,40 @@ public class LinkService {
         }
 
         return links;
+    }
+
+    /**
+     * If alias was found in database will redirect to link of current user.
+     * If user not authenticated will try to find alias in anonymousUser.
+     *
+     * @param alias the alias of redirect link
+     * @return redirect to saved link by alias or to not-found page
+     */
+    public ResponseEntity<HttpHeaders> redirectToUrl(String alias) {
+        Optional<Link> link = getUsersLink(alias);
+        HttpHeaders headers = new HttpHeaders();
+
+        if (link.isEmpty()) {
+            // Searches for link in global user with id 2
+            link = linkDao.getUsersLinkByAlias(alias, 2);
+        }
+
+        if (link.isPresent()) {
+            StringBuilder url = new StringBuilder(link.get().getFullLink());
+
+            if (!url.toString().startsWith("http")) {
+                url.insert(0, "https://");
+            }
+
+            headers.add("Location", url.toString());
+
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }
+
+        String frontendDomain = System.getenv("FRONTEND_DOMAIN") == null ? "localhost:4200" : System.getenv("FRONTEND_DOMAIN");
+        headers.add("Location", "http://" + frontendDomain + "/app-not-found");
+
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     /**
