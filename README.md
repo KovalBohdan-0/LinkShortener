@@ -3,7 +3,7 @@
 ## Link shortener
 
 ### Link
-[Link](linkshort.tech) - linkshort.tech
+[Link](link-shortener-three-topaz.vercel.app/) - link-shortener-three-topaz.vercel.app/
 
 ### Built With
 
