@@ -1,11 +1,10 @@
 package com.linkshortener.service;
 
-import com.linkshortener.dao.GroupDao;
-import com.linkshortener.dao.UserDao;
+import com.linkshortener.repository.GroupRepository;
+import com.linkshortener.repository.UserRepository;
 import com.linkshortener.entity.User;
 import com.linkshortener.enums.UserGroup;
 import com.linkshortener.exception.UserAlreadyExistException;
-import com.linkshortener.security.JwtService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
     @Mock
-    private UserDao userDao;
+    private UserRepository userRepository;
     @Mock
     private BCryptPasswordEncoder passwordEncoder;
     @Mock
@@ -34,13 +33,13 @@ class UserServiceTest {
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
-    private GroupDao groupDao;
+    private GroupRepository groupRepository;
     private AutoCloseable autoCloseable;
 
     @BeforeEach
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        userService = new UserService(userDao, groupDao, jwtService, passwordEncoder, authenticationManager);
+        userService = new UserService(userRepository, groupRepository, jwtService, passwordEncoder, authenticationManager);
     }
 
     @AfterEach
@@ -52,14 +51,14 @@ class UserServiceTest {
     void shouldAddUser() {
         userService.addUser(new User("email", "pass"), UserGroup.USER);
 
-        verify(userDao).save(any(User.class));
+        verify(userRepository).save(any(User.class));
         verify(passwordEncoder).encode(anyString());
     }
 
     @Test
     void shouldFailToAddExistingUser() {
         User user = new User("user", "pass");
-        when(userDao.getByUsername(anyString())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
 
         assertThrows(UserAlreadyExistException.class, () -> userService.addUser(user, UserGroup.USER));
     }
@@ -68,16 +67,16 @@ class UserServiceTest {
     void shouldGetAllUsers() {
         userService.getAllUsers();
 
-        verify(userDao).getAll();
+        verify(userRepository).findAll();
     }
 
     @Test
     void shouldGetUserByEmail() {
-        when(userDao.getByUsername(anyString())).thenReturn(Optional.of(new User()));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(new User()));
 
         userService.getUserByEmail(anyString());
 
-        verify(userDao, atLeastOnce()).getByUsername(anyString());
+        verify(userRepository, atLeastOnce()).findByEmail(anyString());
     }
 
     @Test
@@ -90,28 +89,28 @@ class UserServiceTest {
 
     @Test
     void shouldRemoveUserById() {
-        when(userDao.get(1L)).thenReturn(Optional.of(new User()));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
 
         userService.removeUser(1L);
 
-        verify(userDao).get(anyLong());
-        verify(userDao).delete(any(User.class));
+        verify(userRepository).findById(anyLong());
+        verify(userRepository).delete(any(User.class));
     }
 
     @Test
     void shouldFailToRemoveNotExistingUser() {
-        when(userDao.get(1L)).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         userService.removeUser(1L);
 
-        verify(userDao).get(anyLong());
-        verify(userDao, never()).delete(any(User.class));
+        verify(userRepository).findById(anyLong());
+        verify(userRepository, never()).delete(any(User.class));
     }
 
     @Test
     void shouldRemoveAllUsers() {
         userService.removeAllUsers();
 
-        verify(userDao).deleteAll();
+        verify(userRepository).deleteAll();
     }
 }

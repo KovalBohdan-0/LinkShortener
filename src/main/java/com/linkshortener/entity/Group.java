@@ -5,13 +5,18 @@ import jakarta.persistence.*;
 
 import java.util.Set;
 
-@Entity(name = "roles")
+@Entity
+@Table(name = "roles", schema = "public")
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @Column(unique = true)
+    @Basic
+    @Column(name = "code", unique = true)
     private String code;
+    @Basic
+    @Column(name = "name")
     private String name;
     @JsonIgnore
     @ManyToMany(mappedBy = "roles")

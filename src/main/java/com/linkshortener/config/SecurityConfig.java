@@ -1,6 +1,6 @@
 package com.linkshortener.config;
 
-import com.linkshortener.security.CustomUserDetailsService;
+import com.linkshortener.service.CustomUserDetailsService;
 import com.linkshortener.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

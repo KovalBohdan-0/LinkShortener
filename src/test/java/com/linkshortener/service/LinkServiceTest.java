@@ -1,7 +1,7 @@
 package com.linkshortener.service;
 
-import com.linkshortener.dao.LinkDao;
-import com.linkshortener.dao.UserDao;
+import com.linkshortener.repository.LinkRepository;
+import com.linkshortener.repository.UserRepository;
 import com.linkshortener.entity.Link;
 import com.linkshortener.entity.User;
 import com.linkshortener.exception.LinkAlreadyExistException;
@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,9 +26,9 @@ class LinkServiceTest {
     @InjectMocks
     private LinkService linkService;
     @Mock
-    private LinkDao linkDao;
+    private LinkRepository linkRepository;
     @Mock
-    private UserDao userDao;
+    private UserRepository userRepository;
     @Mock
     private SecurityContext securityContext;
     @Mock
@@ -45,7 +46,7 @@ class LinkServiceTest {
     @BeforeEach
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        linkService = new LinkService(linkDao, userDao);
+        linkService = new LinkService(linkRepository, userRepository);
         SecurityContextHolder.setContext(securityContext);
     }
 
@@ -58,13 +59,13 @@ class LinkServiceTest {
     void shouldGetLinkById() {
         User user = new User();
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userDao.getByUsername(any())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
         when(link.getUser()).thenReturn(user);
-        when(linkDao.get(anyLong())).thenReturn(Optional.of(link));
+        when(linkRepository.findById(anyLong())).thenReturn(Optional.of(link));
 
         boolean founded = linkService.getLinkById(anyLong()).isPresent();
 
-        verify(linkDao).get(anyLong());
+        verify(linkRepository).findById(anyLong());
         assertThat(founded).isTrue();
     }
 
@@ -72,28 +73,28 @@ class LinkServiceTest {
     void shouldNotGetLinkByIdWhenNotFound() {
         User user = new User();
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userDao.getByUsername(any())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
         when(link.getUser()).thenReturn(user);
-        when(linkDao.get(anyLong())).thenReturn(Optional.empty());
+        when(linkRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         boolean founded = linkService.getLinkById(anyLong()).isPresent();
 
-        verify(linkDao).get(anyLong());
+        verify(linkRepository).findById(anyLong());
         assertThat(founded).isFalse();
     }
 
     @Test
-    void shouldGetUsersLinkByAlias() {
+    void shouldfindLinkByUserIdAndAlias() {
         User user = new User();
         user.setId(1L);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userDao.getByUsername(any())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
         when(link.getUser()).thenReturn(user);
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.of(link));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.of(link));
 
         boolean founded = linkService.getUsersLinkByAlias("alias") != null;
 
-        verify(linkDao, atLeastOnce()).getUsersLinkByAlias("alias", 1L);
+        verify(linkRepository, atLeastOnce()).findLinkByUserIdAndAlias(1L, "alias");
         assertThat(founded).isTrue();
     }
 
@@ -102,8 +103,8 @@ class LinkServiceTest {
         User user = new User();
         user.setId(1L);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userDao.getByUsername(any())).thenReturn(Optional.of(user));
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.empty());
 
         assertThrows(LinkNotFoundException.class, () -> linkService.getUsersLinkByAlias("alias"));
     }
@@ -112,7 +113,7 @@ class LinkServiceTest {
     void shouldGetAllLinks() {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
-        when(userDao.getByUsername(authentication.getName())).thenReturn(optionalUser);
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(optionalUser);
         when(optionalUser.get()).thenReturn(user);
 
         linkService.getAllLinks();
@@ -135,12 +136,12 @@ class LinkServiceTest {
         user.setId(1L);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
-        when(userDao.getByUsername(authentication.getName())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(Optional.of(user));
         when(link.getUser()).thenReturn(user);
 
         linkService.addLink(link);
 
-        verify(linkDao).save(any(Link.class));
+        verify(linkRepository).save(any(Link.class));
     }
 
     @Test
@@ -149,8 +150,8 @@ class LinkServiceTest {
         user.setId(1L);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.of(link));
-        when(userDao.getByUsername(authentication.getName())).thenReturn(Optional.of(user));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.of(link));
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(Optional.of(user));
         when(link.getUser()).thenReturn(user);
 
 
@@ -162,8 +163,9 @@ class LinkServiceTest {
         User user = new User();
         user.setId(1L);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.of(link));
-        when(userDao.getByUsername(authentication.getName())).thenReturn(Optional.of(user));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.of(link));
+        when(linkRepository.findLinksByAlias("alias")).thenReturn(List.of(link));
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(Optional.of(user));
 
         linkService.addLinkView("alias");
 
@@ -175,8 +177,8 @@ class LinkServiceTest {
         User user = new User();
         user.setId(1L);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.empty());
-        when(userDao.getByUsername(authentication.getName())).thenReturn(Optional.of(user));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(Optional.of(user));
 
         assertThrows(LinkNotFoundException.class, () -> linkService.addLinkView("alias"));
     }
@@ -187,12 +189,12 @@ class LinkServiceTest {
         user.setId(1L);
         Link link = new Link("fullLink", "alias");
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.of(link));
-        when(userDao.getByUsername(authentication.getName())).thenReturn(Optional.of(user));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.of(link));
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(Optional.of(user));
 
         linkService.updateLink(link, "alias");
 
-        verify(linkDao).update(any(Link.class));
+        verify(linkRepository).update(link.getId(), link.getAlias(), link.getFullLink(), link.getViews());
     }
 
     @Test
@@ -202,14 +204,14 @@ class LinkServiceTest {
         Link newLink = new Link("fullLink", "newAlias");
         Link link = new Link("fullLink", "alias");
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.of(link));
-        when(userDao.getByUsername(authentication.getName())).thenReturn(Optional.of(user));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.of(link));
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(Optional.of(user));
 
         linkService.updateLink(newLink, "alias");
 
-        verify(linkDao, never()).update(any(Link.class));
-        verify(linkDao).delete(any(Link.class));
-        verify(linkDao).save(any(Link.class));
+        verify(linkRepository, never()).update(link.getId(), link.getAlias(), link.getFullLink(), link.getViews());
+        verify(linkRepository).delete(any(Link.class));
+        verify(linkRepository).save(any(Link.class));
     }
 
     @Test
@@ -217,8 +219,8 @@ class LinkServiceTest {
         User user = new User();
         user.setId(1L);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.empty());
-        when(userDao.getByUsername(authentication.getName())).thenReturn(Optional.of(user));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(Optional.of(user));
 
         assertThrows(LinkNotFoundException.class, () -> linkService.updateLink(link, "alias"));
     }
@@ -230,9 +232,9 @@ class LinkServiceTest {
         Link newLink = new Link("fullLink", "newAlias");
         Link link = new Link("fullLink", "alias");
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.of(link));
-        when(linkDao.getUsersLinkByAlias("newAlias", 1L)).thenReturn(Optional.of(link));
-        when(userDao.getByUsername(authentication.getName())).thenReturn(Optional.of(user));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.of(link));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "newAlias")).thenReturn(Optional.of(link));
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(Optional.of(user));
 
         assertThrows(LinkAlreadyExistException.class, () -> linkService.updateLink(newLink, "alias"));
     }
@@ -242,13 +244,13 @@ class LinkServiceTest {
         User user = new User();
         user.setId(1L);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userDao.getByUsername(any())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
         when(link.getUser()).thenReturn(user);
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.of(new Link()));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.of(new Link()));
 
         linkService.removeLink("alias");
 
-        verify(linkDao).delete(any(Link.class));
+        verify(linkRepository).delete(any(Link.class));
     }
 
     @Test
@@ -256,8 +258,8 @@ class LinkServiceTest {
         User user = new User();
         user.setId(1L);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(userDao.getByUsername(any())).thenReturn(Optional.of(user));
-        when(linkDao.getUsersLinkByAlias("alias", 1L)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
+        when(linkRepository.findLinkByUserIdAndAlias(1L, "alias")).thenReturn(Optional.empty());
 
         assertThrows(LinkNotFoundException.class, () -> linkService.removeLink("alias"));
     }
@@ -267,12 +269,12 @@ class LinkServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(optionalUser.isPresent()).thenReturn(true);
         when(optionalUser.get()).thenReturn(user);
-        when(userDao.getByUsername(authentication.getName())).thenReturn(optionalUser);
+        when(userRepository.findByEmail(authentication.getName())).thenReturn(optionalUser);
         when(user.getEmail()).thenReturn("email");
 
         linkService.removeAllLinks();
 
-        verify(linkDao).deleteAllByUserId(anyLong());
+        verify(linkRepository).deleteAllByUserId(anyLong());
     }
 
     @Test
@@ -281,6 +283,6 @@ class LinkServiceTest {
 
         linkService.removeAllLinks();
 
-        verify(linkDao, never()).deleteAll();
+        verify(linkRepository, never()).deleteAll();
     }
 }

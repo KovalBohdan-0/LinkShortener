@@ -1,7 +1,7 @@
 package com.linkshortener.service;
 
-import com.linkshortener.dao.GroupDao;
-import com.linkshortener.dao.UserDao;
+import com.linkshortener.repository.GroupRepository;
+import com.linkshortener.repository.UserRepository;
 import com.linkshortener.entity.Group;
 import com.linkshortener.entity.User;
 import com.linkshortener.enums.UserGroup;
@@ -9,7 +9,6 @@ import com.linkshortener.exception.UserAlreadyExistException;
 import com.linkshortener.exception.UserNotFoundException;
 import com.linkshortener.security.AuthenticationResponse;
 import com.linkshortener.security.CustomUserDetails;
-import com.linkshortener.security.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,8 +30,8 @@ import java.util.Set;
  * retrieving, removing of users
  *
  * @author Bohdan Koval
- * @see UserDao
- * @see GroupDao
+ * @see UserRepository
+ * @see GroupRepository
  * @see UserGroup
  * @see User
  * @see JwtService
@@ -41,15 +40,15 @@ import java.util.Set;
 @Transactional(readOnly = true)
 public class UserService {
     private final static Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-    private final UserDao userDao;
-    private final GroupDao groupDao;
+    private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserDao userDao, GroupDao groupDao, JwtService jwtService, BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
-        this.userDao = userDao;
-        this.groupDao = groupDao;
+    public UserService(UserRepository userRepository, GroupRepository groupRepository, JwtService jwtService, BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -61,7 +60,7 @@ public class UserService {
      * @return all users
      */
     public List<User> getAllUsers() {
-        return userDao.getAll();
+        return userRepository.findAll();
     }
 
     /**
@@ -71,8 +70,8 @@ public class UserService {
      * @return found user, empty optional
      */
     public Optional<User> getUserByEmail(String email) {
-        if (userDao.getByUsername(email).isPresent()) {
-            return Optional.of(userDao.getByUsername(email).get());
+        if (userRepository.findByEmail(email).isPresent()) {
+            return Optional.of(userRepository.findByEmail(email).get());
         }
 
         LOGGER.warn("User with email: {} was not found", email);
@@ -90,12 +89,12 @@ public class UserService {
      */
     @Transactional
     public AuthenticationResponse addUser(User user, UserGroup userGroup) {
-        Optional<User> foundedUser = userDao.getByUsername(user.getEmail());
+        Optional<User> foundedUser = userRepository.findByEmail(user.getEmail());
 
         if (foundedUser.isEmpty()) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             addGroupToUser(user, userGroup);
-            userDao.save(user);
+            userRepository.save(user);
             UserDetails userDetails = new CustomUserDetails(user.getEmail(), user.getPassword());
             String jwt = jwtService.generateJwt(new HashMap<>(), userDetails);
 
@@ -120,8 +119,8 @@ public class UserService {
 
         String role = userGroup.toString();
 
-        LOGGER.info("Adding user with groups :{} and Role :{}", groups, groupDao.getByCode(role).orElse(new Group("Not found", "")));
-        groupDao.getByCode(role).ifPresent(groups::add);
+        LOGGER.info("Adding user with groups :{} and Role :{}", groups, groupRepository.findByCode(role).orElse(new Group("Not found", "")));
+        groupRepository.findByCode(role).ifPresent(groups::add);
         user.setRoles(groups);
     }
 
@@ -153,7 +152,7 @@ public class UserService {
      */
     @Transactional
     public void removeAllUsers() {
-        userDao.deleteAll();
+        userRepository.deleteAll();
     }
 
     /**
@@ -163,6 +162,6 @@ public class UserService {
      */
     @Transactional
     public void removeUser(Long id) {
-        userDao.get(id).ifPresent(userDao::delete);
+        userRepository.findById(id).ifPresent(userRepository::delete);
     }
 }

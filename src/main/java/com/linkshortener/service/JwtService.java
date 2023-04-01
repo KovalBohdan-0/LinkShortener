@@ -1,4 +1,4 @@
-package com.linkshortener.security;
+package com.linkshortener.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

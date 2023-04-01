@@ -26,6 +26,7 @@ public class RedirectController {
             @ApiResponse(responseCode = "200", description = "successfully redirect to url")})
     @GetMapping("/l/{alias}")
     public ResponseEntity<HttpHeaders> redirectToUrl(@PathVariable String alias) {
+        linkService.addLinkView(alias);
         return linkService.redirectToUrl(alias);
     }
 }

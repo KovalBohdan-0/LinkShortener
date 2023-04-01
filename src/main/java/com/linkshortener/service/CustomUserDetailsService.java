@@ -1,9 +1,10 @@
-package com.linkshortener.security;
+package com.linkshortener.service;
 
-import com.linkshortener.dao.GroupDao;
-import com.linkshortener.dao.UserDao;
+import com.linkshortener.repository.GroupRepository;
+import com.linkshortener.repository.UserRepository;
 import com.linkshortener.entity.Group;
 import com.linkshortener.entity.User;
+import com.linkshortener.security.CustomUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,18 +23,18 @@ import java.util.Set;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     private final static Logger LOGGER = LoggerFactory.getLogger(CustomUserDetailsService.class);
-    private final UserDao userDao;
-    private final GroupDao groupDao;
+    private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
 
-    public CustomUserDetailsService(UserDao userDao, GroupDao groupDao) {
-        this.userDao = userDao;
-        this.groupDao = groupDao;
+    public CustomUserDetailsService(UserRepository userRepository, GroupRepository groupRepository) {
+        this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (userDao.getByUsername(username).isPresent()) {
-            User user = userDao.getByUsername(username).get();
+        if (userRepository.findByEmail(username).isPresent()) {
+            User user = userRepository.findByEmail(username).get();
 
             return new CustomUserDetails(username, user.getPassword(), new HashSet<>(getAuthorities(user)));
         }
@@ -43,7 +44,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private Collection<GrantedAuthority> getAuthorities(User user) {
-        Set<Group> userGroups = groupDao.getGroupsByUserId(user.getId());
+        Set<Group> userGroups = groupRepository.findGroupByUsersId(user.getId());
         Collection<GrantedAuthority> authorities = new ArrayList<>(userGroups.size());
 
         for (Group userGroup : userGroups) {
