@@ -82,4 +82,3 @@ export class ShortenerComponent {
     return this.authService.getToken();
   }
 }
-

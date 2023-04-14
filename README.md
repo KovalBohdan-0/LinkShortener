@@ -23,7 +23,12 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+### Short url:
+[![Link shortener Screen Shot][shortener-screenshot]](https://linkshort.tech)
+### Urls:
+[![Link shortener Screen Shot][myurls-screenshot]](https://linkshort.tech)
+### Sign up:
+[![Link shortener Screen Shot][signup-screenshot]](https://linkshort.tech)
 
 Welcome to the readme file for the Link Shortener Project!
 
@@ -32,13 +37,14 @@ This project aims to create a simple yet powerful tool for shortening long URLs 
 To use this link shortener, simply follow the steps below:
 
     Enter the long URL that you want to shorten into the input box on the homepage.
-    Click the "Shorten" button to generate a shortened link.
-    Copy the shortened link and use it wherever you need it.
+    Click the "Short url" button to generate a shortened link.
+    Url automaticly copies the shortened link and you can use it wherever you need it.
 
 Features:
 
     Customizable short link format: You can choose to generate short links in a format that suits your needs.
-    Analytics: The link shortener provides basic analytics, such as the number of clicks, date of creation
+    Analytics: The link shortener provides basic analytics, such as the number of clicks, date of creation.
+    Create account to have ability to change, delete, copy link, watch views, get creation time of link.
     
 Installation:
 
@@ -68,7 +74,7 @@ For installation with docker for development purpose you can use commands below:
     docker-compose up --build -d
 ```
 
-Configuration of different enviroments: 
+Configuration of different environments: 
 ```
     /LinkShortener/src/main/resources/application-XXX.properties
     /LinkShortener/src/main/frontend/src/environments
@@ -80,6 +86,9 @@ Configuration of different enviroments:
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
+[signup-screenshot]: src/main/frontend/src/images/screenshot-signup.png
+[myurls-screenshot]: src/main/frontend/src/images/screenshot-urls.png
+[shortener-screenshot]: src/main/frontend/src/images/screenshot-shortener.png
 [Spring-boot.io]: https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white
 [SpringBoot-url]: https://spring.io/projects/spring-boot
 [Spring-security.io]: https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white
