@@ -68,12 +68,6 @@
               ]
             },
             "development": {
-              "optimization": {
-                "scripts": true,
-                 "styles": true,
-                 "fonts": false
-             },
-             "outputHashing": "all",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

@@ -11,3 +11,7 @@
     margin: 0 auto;
     font-size: larger;
 }
+
+.delete-all {
+    margin-right: 1rem;
+}

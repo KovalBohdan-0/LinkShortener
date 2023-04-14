@@ -1,12 +1,12 @@
 <button class="refresh btn text-white fw-bold" (click)="refreshLinks()"><i class="bi bi-arrow-clockwise"></i>Refresh</button>
 
 <div class="myurls w-50 mx-auto">
-	<button class="btn text-danger d-flex ms-auto fw-bold" (click)="deleteAllLinks()"><i class="bi bi-x-circle-fill"></i>Delete all</button>
+	<button class="btn btn-danger text-light d-flex ms-auto fw-bold delete-all" (click)="deleteAllLinks()"><i class="bi bi-x-circle-fill"></i>Delete all</button>
 
     <div *ngFor="let link of currentLinks">
         <app-myurl [currentLinks]="currentLinks" [link]="link"></app-myurl>
     </div>
-	<button class="btn btn-lg bg-primary text-white d-flex mx-auto fw-bold" (click)="redirectToShortener()">Add link</button>
+	<button class="btn btn-lg bg-white text-dark d-flex mx-auto fw-bold" (click)="redirectToShortener()">Add link</button>
     
 <div class="d-flex justify-content-between p-2">
 	<ngb-pagination
@@ -17,7 +17,7 @@
 	>
 	</ngb-pagination>
 
-	<select class="form-select bg-primary border border-primary fw-normal text-white" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="updateLinks()">
+	<select class="form-select bg-light border border-light fw-normal text-dark" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="updateLinks()">
 		<option [ngValue]="2">2 links per page</option>
 		<option [ngValue]="4">4 links per page</option>
 		<option [ngValue]="6">6 links per page</option>

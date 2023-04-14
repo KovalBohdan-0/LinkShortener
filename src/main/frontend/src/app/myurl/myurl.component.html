@@ -1,10 +1,10 @@
-<div class="myurl p-4 bg-primary rounded-4 m-1 text-white d-flex flex-column">
+<div class="myurl p-4 m-1 text-dark d-flex flex-column">
     <div>
         <img src="{{getFavicon(link)}}" alt="">
-        <a target="_blank" href="{{link.fullLink}}" class="text-white">{{(link.fullLink.length>40)? (link.fullLink |
+        <a target="_blank" href="{{link.fullLink}}" class="text-dark">{{(link.fullLink.length>40)? (link.fullLink |
             slice:0:40)+'...':(link.fullLink)}}</a>
         <div class="">
-            <a target="_blank" href="{{environment.domain}}l/{{link.alias}}" class="text-white">{{environment.domain}}l/{{link.alias}}</a>
+            <a target="_blank" href="{{environment.domain}}l/{{link.alias}}" class="text-dark">{{environment.domain}}l/{{link.alias}}</a>
         </div>
     </div>
     <div class="information ms-auto d-flex flex-column">

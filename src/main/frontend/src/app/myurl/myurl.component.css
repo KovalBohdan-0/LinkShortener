@@ -5,6 +5,7 @@ a {
 
 .myurl {
     min-width: 17rem;
+    background-color: rgba(238, 234, 234, 0.8);
 }
 
 .url-button {
