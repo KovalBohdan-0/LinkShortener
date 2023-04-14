@@ -68,7 +68,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://linkshort.tech"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://linkshort.tech", "https://link-shortener-shadee404.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET" ,"POST" , "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
