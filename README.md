@@ -3,7 +3,7 @@
 ## Link shortener
 
 ### Link
-[Link](link-shortener-three-topaz.vercel.app/) - link-shortener-three-topaz.vercel.app/
+[Link](home.linkshort.tech) - home.linkshort.tech
 
 ### Built With
 
@@ -24,11 +24,11 @@
 ## About The Project
 
 ### Short url:
-[![Link shortener Screen Shot][shortener-screenshot]](https://linkshort.tech)
+[![Link shortener Screen Shot][shortener-screenshot]](https://home.linkshort.tech)
 ### Urls:
-[![Link shortener Screen Shot][myurls-screenshot]](https://linkshort.tech)
+[![Link shortener Screen Shot][myurls-screenshot]](https://home.linkshort.tech)
 ### Sign up:
-[![Link shortener Screen Shot][signup-screenshot]](https://linkshort.tech)
+[![Link shortener Screen Shot][signup-screenshot]](https://home.linkshort.tech)
 
 Welcome to the readme file for the Link Shortener Project!
 

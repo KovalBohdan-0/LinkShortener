@@ -1,15 +1,17 @@
 <button class="refresh btn text-white fw-bold" (click)="refreshLinks()"><i class="bi bi-arrow-clockwise"></i>Refresh</button>
 
 <div class="myurls w-50 mx-auto">
-	<button class="btn btn-danger text-light d-flex ms-auto fw-bold delete-all" (click)="deleteAllLinks()"><i class="bi bi-x-circle-fill"></i>Delete all</button>
+	<button *ngIf="links.length != 0" class="btn btn-danger text-light d-flex ms-auto fw-bold delete-all" (click)="deleteAllLinks()"><i class="bi bi-x-circle-fill"></i>Delete all</button>
 
     <div *ngFor="let link of currentLinks">
         <app-myurl [currentLinks]="currentLinks" [link]="link"></app-myurl>
     </div>
+	<h1 *ngIf="links.length == 0" class="text-black mx-auto text-center my-5 py-5 bg-white opacity-50 w-50" >First add links</h1>
+	<h1 *ngIf="links.length == 0" class="text-black mx-auto text-center w-50" >⬇</h1>
 	<button class="btn btn-lg bg-white text-dark d-flex mx-auto fw-bold" (click)="redirectToShortener()">Add link</button>
     
 <div class="d-flex justify-content-between p-2">
-	<ngb-pagination
+	<ngb-pagination *ngIf="links.length != 0"
 		[collectionSize]="collectionSize"
 		[(page)]="page"
 		[pageSize]="pageSize"
@@ -17,7 +19,7 @@
 	>
 	</ngb-pagination>
 
-	<select class="form-select bg-light border border-light fw-normal text-dark" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="updateLinks()">
+	<select *ngIf="links.length != 0" class="form-select bg-light border border-light fw-normal text-dark" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="updateLinks()">
 		<option [ngValue]="2">2 links per page</option>
 		<option [ngValue]="4">4 links per page</option>
 		<option [ngValue]="6">6 links per page</option>
