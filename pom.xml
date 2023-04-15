@@ -103,23 +103,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>aws</id>
-            <properties>
-                <spring.profiles.active>
-                    aws
-                </spring.profiles.active>
-            </properties>
-        </profile>
-        <profile>
-            <id>render</id>
-            <properties>
-                <spring.profiles.active>
-                    render
-                </spring.profiles.active>
-            </properties>
-        </profile>
-    </profiles>
 </project>
