@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
  */
 @Validated
 @RestController
-@CrossOrigin
 @RequestMapping("/api/links")
 public class LinkController {
     private final LinkService linkService;

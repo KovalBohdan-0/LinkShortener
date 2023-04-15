@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
  */
 @Validated
 @RestController
-@CrossOrigin
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
