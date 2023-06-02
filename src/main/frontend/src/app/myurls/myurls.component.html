@@ -6,8 +6,7 @@
     <div *ngFor="let link of currentLinks">
         <app-myurl [currentLinks]="currentLinks" [link]="link"></app-myurl>
     </div>
-	<h1 *ngIf="links.length == 0" class="text-black mx-auto text-center my-5 py-5 bg-white opacity-50 w-50" >First add links</h1>
-	<h1 *ngIf="links.length == 0" class="text-black mx-auto text-center w-50" >⬇</h1>
+	<h1 *ngIf="links.length == 0" class="text-black mx-auto text-center my-5 py-5 bg-white opacity-50 w-50" >No links to show</h1>
 	<button class="btn btn-lg bg-white text-dark d-flex mx-auto fw-bold" (click)="redirectToShortener()">Add link</button>
     
 <div class="d-flex justify-content-between p-2">

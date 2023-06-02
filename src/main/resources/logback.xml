@@ -9,21 +9,21 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>C:\\log\\output.log</file>
-        <append>true</append>
-        <immediateFlush>true</immediateFlush>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <maxFileSize>10MB</maxFileSize>
-            <totalSizeCap>80MB</totalSizeCap>
-        </rollingPolicy>
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS}  [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+<!--    <appender name="FILE" class="ch.qos.logback.core.FileAppender">-->
+<!--        <file>C:\\log\\output.log</file>-->
+<!--        <append>true</append>-->
+<!--        <immediateFlush>true</immediateFlush>-->
+<!--        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
+<!--            <maxFileSize>10MB</maxFileSize>-->
+<!--            <totalSizeCap>80MB</totalSizeCap>-->
+<!--        </rollingPolicy>-->
+<!--        <encoder>-->
+<!--            <pattern>%d{HH:mm:ss.SSS}  [%thread] %-5level %logger{36} - %msg%n</pattern>-->
+<!--        </encoder>-->
+<!--    </appender>-->
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE" />
+<!--        <appender-ref ref="FILE" />-->
     </root>
 </configuration>

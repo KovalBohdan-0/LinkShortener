@@ -4,7 +4,6 @@ import com.linkshortener.service.CustomUserDetailsService;
 import com.linkshortener.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -19,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,13 +27,11 @@ import java.util.List;
 public class SecurityConfig {
     private final CustomUserDetailsService myUserDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CorsFilter corsFilter;
 
 
-    public SecurityConfig(CustomUserDetailsService myUserDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter, @Lazy CorsFilter corsFilter) {
+    public SecurityConfig(CustomUserDetailsService myUserDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.myUserDetailsService = myUserDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.corsFilter = corsFilter;
     }
 
     @Bean
@@ -71,29 +67,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("*"));
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("DELETE");
-        source.registerCorsConfiguration("/**", config);
-
-        return new CorsFilter(source);
-    }
-
-    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");
-        configuration.setAllowedOrigins(List.of("https://home.linkshort.tech/", "https://home.linkshort.tech", "http://home.linkshort.tech/", "http://home.linkshort.tech"));
+        configuration.setAllowedOrigins(List.of("https://home.linkshort.tech/", "https://home.linkshort.tech", "http://home.linkshort.tech/", "http://home.linkshort.tech", "http://localhost:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET" ,"POST" , "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
