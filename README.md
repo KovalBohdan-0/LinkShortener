@@ -2,9 +2,6 @@
 
 ## Link shortener
 
-### Link
-[Link](home.linkshort.tech) - home.linkshort.tech
-
 ### Built With
 
 * [![Spring Boot][Spring-boot.io]][SpringBoot-url]
